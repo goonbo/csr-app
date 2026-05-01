@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VIEW
 
-## Getting Started
+Demo-ready clickable prototype of an AI-native CSR (Corporate Social Responsibility) operator platform for mid-market companies. Helps a lean CSR lead source nonprofit partners, plan volunteer events, run them, and report on them.
 
-First, run the development server:
+No backend, no auth, no real AI calls — every flow is seeded with deterministic responses behind multi-step loading sequences.
+
+## Stack
+
+- Next.js 15 (App Router) + TypeScript
+- Tailwind v4 (layout primitives only — color/typography use inline styles sourced from `src/lib/tokens.ts`)
+- `next/font/google` for Instrument Serif + DM Sans
+- `lucide-react` for icons
+- pnpm as the package manager
+
+## Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires Node 20+ and pnpm 9+ (`corepack enable` if you don't have pnpm installed).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+The role switcher in the top nav toggles between Admin (`/`) and Employee (`/me`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Admin (`/`):**
+- `/` — Workbench: what needs you today, pipeline flow, recruiting now, year-so-far KPIs
+- `/partners` and `/partners/[id]` — Partners list and detail (with AI diligence flow)
+- `/events` and `/events/[id]` — Events list and detail (stage-specific UI)
+- `/events/new` — Event builder (textarea → AI plan → 5 editable outputs)
+- `/events/[id]/recap` — AI-generated exec recap document
+- `/reports` — Quarterly program review
 
-## Deploy on Vercel
+**Employee (`/me`):**
+- `/me` — Volunteer home with VTO progress
+- `/me/opportunities` — Opportunities to discover
+- `/me/profile` — My impact
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### AI flows (all mocked)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Three deterministic AI sequences, each ~3s:
+- Partner diligence (`/partners/[id]` → "Run AI diligence")
+- Event plan (`/events/new` → "Plan this with me")
+- Event recap (`/events/[id]/recap` — auto-starts on completed events)
+
+Pre-baked responses live in `src/lib/seed/` (`ai-plan.ts`, `ai-recap.ts`, partner `diligence` fields).
+
+## Build
+
+```bash
+pnpm build
+pnpm start
+```
+
+## Deploy
+
+Push to a Git remote and import the repo into Vercel — no configuration required. Build command `pnpm build`, output `.next`. Vercel's defaults work out of the box.
+
+```bash
+# or with the Vercel CLI
+npx vercel
+```
+
+## Accessibility
+
+Lighthouse accessibility: **100/100** across all 11 routes. Verified:
+- Focus-visible: 2px terracotta outline (`#A0533C`) on every interactive element
+- Reduced-motion: animations and transitions collapse to 0.01ms when `prefers-reduced-motion: reduce`
+- All decorative icons carry `aria-hidden`
+- Loading states use `role="status"` + `aria-live="polite"` (see `src/components/primitives/LoadingSteps.tsx`)
+- Interactive cards use the `Card` primitive's built-in `role="button"` + `tabIndex` + Enter/Space handlers
+
+## Project layout
+
+```
+src/
+  app/
+    (admin)/        # admin route group
+    (employee)/     # employee route group
+    layout.tsx      # root layout + TopNav
+    globals.css     # focus styles, reduced-motion, keyframes
+  components/
+    primitives/     # Button, Pill, Card, AIBlock, LoadingSteps, ReadinessTag, PageHeader
+    layout/         # TopNav
+    admin/          # admin-only composites (DemandSignalsPanel)
+  lib/
+    tokens.ts       # `C` constant — every color in one place
+    types.ts
+    format.ts
+    useAILoad.ts    # 4-step loading hook, total ~3s
+    seed/           # typed seed data — partners, events, employees, ai-plan, ai-recap, etc.
+```
+
+Color and typography tokens live in `src/lib/tokens.ts`. Inline styles sourced from `C` are the rule — Tailwind only handles layout primitives (flex/grid/spacing/responsive breakpoints).
