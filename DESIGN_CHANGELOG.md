@@ -1,24 +1,25 @@
 # Design Changelog
 
 Tracking the redesign from the cream/sage/terracotta prototype to the
-**Operator + Blueprint + Pulse** blend chosen 2026-05-04.
+**Operator + Blueprint** blend (revised 2026-05-04).
 
 ## Direction
 
-A blend of three rebuilt directions, each anchored on the brand
-navy + cyan logo:
+Two rebuilt directions, each anchored on the brand navy + cyan logo:
 
 - **Operator** — daily workbench. White surface, navy ink, cyan action,
-  Inter + JetBrains Mono, dense 4–6px radii. Used for app chrome
-  (TopNav) and admin dashboard / list pages.
+  Inter Tight + JetBrains Mono, dense 6–8px radii. Used for app chrome
+  (TopNav) and **all admin and employee pages**.
 - **Blueprint** — narrative pages. Mist-white `#F5F7FA`, Fraunces serif
   hero, generous spacing. Used inside Operator chrome on `/reports` and
   `/events/[id]/recap` — the editorial moments.
-- **Pulse** — employee experience. Deep navy `#050D17` with ambient dot
-  field, cyan→mint accent, Bricolage Grotesque hero. Pulse takes over
-  the chrome on `/me/*` routes (chrome flips dark).
 
-Rendered preview at `public/_preview/blend.html`.
+The original plan included a third theme (Pulse — deep navy, dot field,
+Bricolage display) for the employee side. Pivoted 2026-05-04 in favor of
+admin/employee parity. Pulse CSS scope and font are kept in
+`globals.css` and `layout.tsx` for now in case it's wanted back; the
+blend preview at `public/_preview/blend.html` documents what it looked
+like.
 
 ## Token system
 
@@ -32,13 +33,13 @@ hex value.
 |-------------|---------------------------|------------|---------|---------|
 | Operator    | `:root` (default)         | `#FFFFFF`  | `#0A1A2E` | `#0891B2` |
 | Blueprint   | `[data-theme="blueprint"]` | `#F5F7FA`  | `#0A1A2E` | `#0891B2` |
-| Pulse       | `[data-theme="pulse"]`    | `#050D17`  | `#F8FAFC` | `#22D3EE` |
 
-The `(admin)` route group inherits the `:root` (Operator) defaults.
-The `(employee)` route group sets `[data-theme="pulse"]` at the
-layout level, flipping the chrome and content together. Narrative
-pages inside admin (recap / reports) wrap their content in
-`[data-theme="blueprint"]`.
+Both `(admin)` and `(employee)` route groups set
+`data-theme="operator"`. Narrative pages inside admin (recap / reports)
+wrap their content in `[data-theme="blueprint"]`.
+
+(Pulse — `[data-theme="pulse"]` — is still defined in `globals.css` but
+no longer wired up. Kept as dead-but-revivable CSS for now.)
 
 ## Fonts
 
@@ -53,6 +54,13 @@ variables for theme-level selection.
 | `--font-display`| Bricolage Grotesque (var.) | Pulse hero copy                |
 
 ## Migration history
+
+### 2026-05-04 — Pivot: drop Pulse, employee matches admin
+- `(employee)/layout.tsx` now uses `data-theme="operator"` and drops
+  the ambient dot field. Employee pages render with the same chrome,
+  surface, type, and accent as admin.
+- Pulse CSS scope and `--font-display` (Bricolage) left in place; can
+  be re-enabled by setting `data-theme="pulse"` again.
 
 ### 2026-05-04 — Foundation
 - Added `DESIGN_CHANGELOG.md`
