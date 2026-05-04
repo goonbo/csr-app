@@ -83,7 +83,7 @@ export default function EmployeeProfilePage() {
                   Hours given · this year
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-serif), serif',
+                  fontFamily: 'var(--font-h1), sans-serif',
                   fontSize: 64, lineHeight: 1, color: C.ink,
                   fontVariantNumeric: 'tabular-nums',
                 }}>
@@ -108,7 +108,7 @@ export default function EmployeeProfilePage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: 'white',
                   fontSize: 28, fontWeight: 600,
-                  fontFamily: 'var(--font-serif), serif',
+                  fontFamily: 'var(--font-h1), sans-serif',
                   flexShrink: 0,
                 }}
               >
@@ -151,7 +151,7 @@ export default function EmployeeProfilePage() {
                           {b.cause}
                         </div>
                         <span style={{
-                          fontFamily: 'var(--font-serif), serif',
+                          fontFamily: 'var(--font-h1), sans-serif',
                           fontSize: 16, color: C.ink,
                           fontVariantNumeric: 'tabular-nums',
                         }}>
@@ -244,10 +244,10 @@ export default function EmployeeProfilePage() {
                       cursor: 'pointer',
                       background: active ? C.sageGlow : 'transparent',
                       color: active ? C.sageDeep : C.muted,
-                      borderTop: `1px solid ${active ? '#A8C09E' : C.borderStrong}`,
-                      borderRight: `1px solid ${active ? '#A8C09E' : C.borderStrong}`,
-                      borderBottom: `1px solid ${active ? '#A8C09E' : C.borderStrong}`,
-                      borderLeft: `1px solid ${active ? '#A8C09E' : C.borderStrong}`,
+                      borderTop: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
+                      borderRight: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
+                      borderBottom: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
+                      borderLeft: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
                       display: 'inline-flex', alignItems: 'center', gap: 4,
                       transition: 'background 150ms, color 150ms, border-color 150ms',
                     }}
@@ -271,7 +271,7 @@ export default function EmployeeProfilePage() {
             <div style={{
               fontSize: 13, color: C.ink, lineHeight: 1.55,
             }}>
-              <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: 16, fontStyle: 'italic' }}>
+              <span style={{ fontFamily: 'var(--font-h1), sans-serif', fontSize: 16, fontStyle: 'italic' }}>
                 {EMPLOYEE_SIGNALS.preferredFormat}.
               </span>
               <div style={{
@@ -386,10 +386,10 @@ function TimelineRow({ event, isLast }: { event: Event; isLast: boolean }) {
           borderRadius: 999,
           background: C.sageGlow,
           color: C.sageDeep,
-          borderTop: '1px solid #A8C09E',
-          borderRight: '1px solid #A8C09E',
-          borderBottom: '1px solid #A8C09E',
-          borderLeft: '1px solid #A8C09E',
+          borderTop: '1px solid var(--accent)',
+          borderRight: '1px solid var(--accent)',
+          borderBottom: '1px solid var(--accent)',
+          borderLeft: '1px solid var(--accent)',
           fontWeight: 600,
         }}>
           <Heart size={10} strokeWidth={2.4} aria-hidden="true" />

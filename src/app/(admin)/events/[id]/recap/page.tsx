@@ -53,7 +53,7 @@ export default function EventRecapPage({ params }: RecapPageProps) {
   ].filter(Boolean) as string[];
 
   return (
-    <div>
+    <div data-theme="blueprint">
       <PageHeader
         back="Back to event"
         onBack={() => router.push(`/events/${event.id}`)}
@@ -139,7 +139,7 @@ export default function EventRecapPage({ params }: RecapPageProps) {
             </div>
             <AIBlock label="AI draft · editable" onRegen={regenerate}>
               <p style={{
-                fontFamily: 'var(--font-serif), serif',
+                fontFamily: 'var(--font-h1), sans-serif',
                 fontSize: 18,
                 lineHeight: 1.6,
                 color: C.ink,
@@ -280,7 +280,7 @@ function VoiceQuote({ voice }: { voice: AIRecapVoice }) {
         style={{ position: 'absolute', top: 16, left: 16, opacity: 0.5 }}
       />
       <p style={{
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
         fontSize: 17, fontStyle: 'italic',
         color: C.ink, lineHeight: 1.55,
         margin: 0, marginBottom: 12,
@@ -315,7 +315,7 @@ function NextItem({ item, index }: { item: AIRecapNext; index: number }) {
         color: C.sageDeep,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 12, fontWeight: 700,
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
       }}>
         {index}
       </div>

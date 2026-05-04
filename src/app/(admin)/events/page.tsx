@@ -124,7 +124,7 @@ export default function EventsListPage() {
               onClick={() => router.push(`/events/${e.id}`)}
               style={{
                 padding: 24,
-                borderLeft: isAtRisk ? `3px solid #A33333` : undefined,
+                borderLeft: isAtRisk ? `3px solid var(--rose)` : undefined,
               }}
             >
               {/* Top row: pipeline stage + secondary signal */}
@@ -154,7 +154,7 @@ export default function EventsListPage() {
 
               {/* Title */}
               <h2 style={{
-                fontFamily: 'var(--font-serif), serif',
+                fontFamily: 'var(--font-h1), sans-serif',
                 fontSize: 22, fontWeight: 400,
                 color: C.ink, lineHeight: 1.2,
                 marginBottom: 4, marginTop: 0,
@@ -193,7 +193,7 @@ export default function EventsListPage() {
                     {e.vto && <Pill tone="terracotta">VTO</Pill>}
                   </div>
                   {e.diagnosis && e.diagnosis.length > 0 && (
-                    <div style={{ paddingLeft: 12, borderLeft: `2px solid #A33333` }}>
+                    <div style={{ paddingLeft: 12, borderLeft: `2px solid var(--rose)` }}>
                       <div style={{
                         fontSize: 11, fontWeight: 600,
                         color: C.inkLight, marginBottom: 4,
@@ -220,7 +220,7 @@ export default function EventsListPage() {
               {e.pipeline === 'proposed' && e.awaitingApproval && (
                 <div style={{
                   fontSize: 12, color: C.inkLight, lineHeight: 1.5,
-                  paddingLeft: 12, borderLeft: `2px solid #A87E2E`,
+                  paddingLeft: 12, borderLeft: `2px solid var(--amber)`,
                 }}>
                   Awaiting <strong style={{ color: C.ink }}>{e.awaitingApproval}</strong>
                 </div>
@@ -229,7 +229,7 @@ export default function EventsListPage() {
               {e.pipeline === 'vetting' && e.awaitingPartner && (
                 <div style={{
                   fontSize: 12, color: C.inkLight, lineHeight: 1.5,
-                  paddingLeft: 12, borderLeft: `2px solid #A87E2E`,
+                  paddingLeft: 12, borderLeft: `2px solid var(--amber)`,
                 }}>
                   Awaiting partner: {e.awaitingPartner}
                 </div>

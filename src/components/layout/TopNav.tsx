@@ -33,7 +33,6 @@ const roleFromPath = (pathname: string): Role =>
 
 const isItemActive = (item: NavItem, pathname: string): boolean => {
   if (item.matchPrefix) return pathname === item.matchPrefix || pathname.startsWith(item.matchPrefix + '/');
-  // Exact-match home routes ("/" and "/me") so they don't match descendants
   return pathname === item.href;
 };
 
@@ -42,6 +41,7 @@ export function TopNav() {
   const pathname = usePathname() || '/';
   const role = roleFromPath(pathname);
   const items = role === 'admin' ? NAV_ADMIN : NAV_EMP;
+  const workspaceLabel = role === 'admin' ? 'CloudMotion · Admin' : 'My View';
 
   const switchRole = (r: Role) => {
     if (r === role) return;
@@ -53,10 +53,10 @@ export function TopNav() {
       className="px-4 sm:px-6 md:px-8"
       style={{
         position: 'sticky', top: 0, zIndex: 30,
-        paddingTop: 14, paddingBottom: 14,
+        paddingTop: 12, paddingBottom: 12,
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        background: 'rgba(248, 244, 237, 0.9)',
+        background: `color-mix(in srgb, ${C.paper} 80%, transparent)`,
         borderBottom: `1px solid ${C.border}`,
       }}
     >
@@ -64,49 +64,62 @@ export function TopNav() {
         className="flex flex-wrap items-center justify-between gap-3 md:gap-6"
         style={{ maxWidth: 1280, margin: '0 auto' }}
       >
-        {/* Logo */}
-        <Link
-          href={role === 'admin' ? '/' : '/me'}
-          className="view-btn"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            textDecoration: 'none',
-            borderRadius: 6,
-          }}
-          aria-label="VIEW home"
-        >
-          <div
+        {/* Logo + workspace pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Link
+            href={role === 'admin' ? '/' : '/me'}
+            className="view-btn"
             style={{
-              width: 36, height: 36, borderRadius: 10,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: `linear-gradient(135deg, ${C.sage}, ${C.sageLight})`,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              textDecoration: 'none',
+              borderRadius: 6,
             }}
-            aria-hidden="true"
+            aria-label="VIEW home"
           >
-            <Heart size={16} color="white" fill="white" strokeWidth={2.2} />
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-serif), serif',
-            fontSize: 18,
-            color: C.ink,
-            letterSpacing: '-0.01em',
-          }}>
-            VIEW
-          </div>
-        </Link>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/view-logo.png"
+              alt=""
+              width={32}
+              height={32}
+              style={{ display: 'block', flexShrink: 0 }}
+            />
+            <span style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: C.ink,
+              letterSpacing: '-0.01em',
+            }}>
+              VIEW
+            </span>
+          </Link>
 
-        {/* Nav pills */}
+          {/* Workspace pill */}
+          <span
+            className="hidden md:inline-flex"
+            style={{
+              alignItems: 'center',
+              padding: '4px 10px',
+              borderRadius: 6,
+              background: C.oat,
+              color: C.muted,
+              fontSize: 12,
+              fontWeight: 500,
+              letterSpacing: '-0.005em',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {workspaceLabel}
+          </span>
+        </div>
+
+        {/* Tab-style nav */}
         <nav
           aria-label="Primary"
           style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: 4,
-            borderRadius: 999,
-            background: C.oat,
-            border: `1px solid ${C.border}`,
+            display: 'flex', alignItems: 'center', gap: 2,
           }}
         >
           {items.map(item => {
@@ -120,21 +133,20 @@ export function TopNav() {
                 aria-label={item.label}
                 className="view-btn flex items-center gap-1.5"
                 style={{
-                  padding: '6px 14px',
-                  borderRadius: 999,
+                  padding: '6px 12px',
+                  borderRadius: 6,
                   fontSize: 13,
                   fontWeight: 500,
                   fontFamily: 'inherit',
                   color: active ? C.ink : C.muted,
-                  background: active ? C.paper : 'transparent',
-                  boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  background: active ? C.oat : 'transparent',
                   border: 'none',
                   cursor: 'pointer',
                   textDecoration: 'none',
                   transition: 'background 150ms ease, color 150ms ease',
                 }}
               >
-                <Icon size={13} strokeWidth={2.2} aria-hidden="true" />
+                <Icon size={14} strokeWidth={2} aria-hidden="true" />
                 <span className="hidden md:inline">{item.label}</span>
               </Link>
             );
@@ -142,13 +154,13 @@ export function TopNav() {
         </nav>
 
         {/* Role switch + avatar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div
             role="group"
             aria-label="Switch role"
             style={{
               display: 'flex', padding: 2,
-              borderRadius: 999,
+              borderRadius: 6,
               background: C.oat,
               border: `1px solid ${C.border}`,
             }}
@@ -163,14 +175,14 @@ export function TopNav() {
                   aria-pressed={isCurrent}
                   className="view-btn"
                   style={{
-                    padding: '4px 12px',
-                    borderRadius: 999,
+                    padding: '4px 10px',
+                    borderRadius: 4,
                     fontSize: 11,
                     fontWeight: 600,
                     fontFamily: 'inherit',
                     color: isCurrent ? C.ink : C.muted,
                     background: isCurrent ? C.paper : 'transparent',
-                    boxShadow: isCurrent ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                    boxShadow: isCurrent ? '0 1px 2px rgba(10,26,46,0.06)' : 'none',
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'background 150ms ease, color 150ms ease',
@@ -183,10 +195,11 @@ export function TopNav() {
           </div>
           <div
             style={{
-              width: 36, height: 36, borderRadius: '50%',
+              width: 30, height: 30, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'white', fontSize: 12, fontWeight: 600,
-              background: `linear-gradient(135deg, ${C.terracotta}, #B96B52)`,
+              color: C.paper, fontSize: 11, fontWeight: 700,
+              background: `linear-gradient(135deg, ${C.sage}, ${C.sageDeep})`,
+              boxShadow: `0 0 0 1px ${C.border}`,
             }}
             aria-label="Sarah Chen"
           >

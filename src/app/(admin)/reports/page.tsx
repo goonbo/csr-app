@@ -14,7 +14,7 @@ export default function ReportsPage() {
   const r = PROGRAM_REVIEW;
 
   return (
-    <div>
+    <div data-theme="blueprint">
       <PageHeader
         greeting="Program review"
         title={r.quarter}
@@ -69,7 +69,7 @@ export default function ReportsPage() {
             The shape of the quarter
           </div>
           <p style={{
-            fontFamily: 'var(--font-serif), serif',
+            fontFamily: 'var(--font-h1), sans-serif',
             fontSize: 30, lineHeight: 1.25,
             color: C.ink, margin: 0,
             letterSpacing: '-0.01em',
@@ -104,7 +104,7 @@ export default function ReportsPage() {
             The summary, plain
           </h2>
           <p style={{
-            fontFamily: 'var(--font-serif), serif',
+            fontFamily: 'var(--font-h1), sans-serif',
             fontSize: 18, lineHeight: 1.6,
             color: C.ink, margin: 0,
           }}>
@@ -211,7 +211,7 @@ function KpiBlock({ value, label, sub }: { value: string; label: string; sub: st
   return (
     <div>
       <div style={{
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
         fontSize: 38, lineHeight: 1, color: C.ink,
         fontVariantNumeric: 'tabular-nums',
         marginBottom: 8,
@@ -284,7 +284,7 @@ function RecommendationItem({
           color: C.sageDeep,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 12, fontWeight: 700,
-          fontFamily: 'var(--font-serif), serif',
+          fontFamily: 'var(--font-h1), sans-serif',
         }}
       >
         {index}

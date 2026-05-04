@@ -92,18 +92,18 @@ export default function AdminHomePage() {
               <Card
                 key={e.id}
                 onClick={() => router.push(`/events/${e.id}`)}
-                style={{ padding: 18, borderLeft: `3px solid #A33333` }}
+                style={{ padding: 18, borderLeft: `3px solid var(--rose)` }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <div
                     style={{
                       width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                      background: '#F4D6D6',
+                      background: 'var(--rose-bg)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}
                     aria-hidden="true"
                   >
-                    <AlertCircle size={14} color="#7A2222" strokeWidth={2.4} />
+                    <AlertCircle size={14} color="var(--rose-fg)" strokeWidth={2.4} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
@@ -135,18 +135,18 @@ export default function AdminHomePage() {
             <Card
               key={e.id}
               onClick={() => router.push(`/events/${e.id}`)}
-              style={{ padding: 18, borderLeft: `3px solid #A87E2E` }}
+              style={{ padding: 18, borderLeft: `3px solid var(--amber)` }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <div
                   style={{
                     width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    background: '#F5E8C8',
+                    background: 'var(--amber-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                   aria-hidden="true"
                 >
-                  <Clock size={14} color="#6B4E1A" strokeWidth={2.4} />
+                  <Clock size={14} color="var(--amber-fg)" strokeWidth={2.4} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
@@ -171,18 +171,18 @@ export default function AdminHomePage() {
             <Card
               key={e.id}
               onClick={() => router.push(`/events/${e.id}`)}
-              style={{ padding: 18, borderLeft: `3px solid #A87E2E` }}
+              style={{ padding: 18, borderLeft: `3px solid var(--amber)` }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <div
                   style={{
                     width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    background: '#F5E8C8',
+                    background: 'var(--amber-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                   aria-hidden="true"
                 >
-                  <Edit3 size={14} color="#6B4E1A" strokeWidth={2.4} />
+                  <Edit3 size={14} color="var(--amber-fg)" strokeWidth={2.4} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
@@ -311,7 +311,7 @@ export default function AdminHomePage() {
                         {dateBits[0]}
                       </div>
                       <div style={{
-                        fontFamily: 'var(--font-serif), serif',
+                        fontFamily: 'var(--font-h1), sans-serif',
                         fontSize: 20, lineHeight: 1,
                       }}>
                         {dateBits[1]}
@@ -376,7 +376,7 @@ export default function AdminHomePage() {
                     </div>
                   </div>
                   <div style={{
-                    fontFamily: 'var(--font-serif), serif',
+                    fontFamily: 'var(--font-h1), sans-serif',
                     fontSize: 24, color: C.ink, lineHeight: 1,
                   }}>
                     {k.value}
@@ -423,11 +423,11 @@ const STAGE_TONE_STYLES: Record<
   PillTone,
   { bg: string; accent: string; label: string; ring: string }
 > = {
-  neutral:    { bg: C.oat,             accent: C.borderStrong, label: C.muted,           ring: C.border },
-  sage:       { bg: C.sageGlow,        accent: '#7E9B73',       label: C.sageDeep,        ring: '#A8C09E' },
-  amber:      { bg: '#F5E8C8',         accent: '#A87E2E',       label: '#6B4E1A',         ring: '#D4B96A' },
-  rose:       { bg: '#F4D6D6',         accent: '#A33333',       label: '#7A2222',         ring: '#D89494' },
-  terracotta: { bg: C.terracottaGlow,  accent: C.terracotta,    label: C.terracottaDeep,  ring: '#D8A88E' },
+  neutral:    { bg: C.oat,             accent: C.borderStrong,  label: C.muted,          ring: C.border },
+  sage:       { bg: C.sageGlow,        accent: C.sage,          label: C.sageDeep,       ring: C.sage },
+  amber:      { bg: 'var(--amber-bg)', accent: 'var(--amber)',  label: 'var(--amber-fg)', ring: 'var(--amber)' },
+  rose:       { bg: 'var(--rose-bg)',  accent: 'var(--rose)',   label: 'var(--rose-fg)',  ring: 'var(--rose)' },
+  terracotta: { bg: C.terracottaGlow,  accent: C.terracotta,    label: C.terracottaDeep, ring: C.terracotta },
 };
 
 interface PipelineFlowProps {
@@ -486,7 +486,7 @@ function PipelineFlow({
             {atRiskCount > 0 && (
               <>
                 {' · '}
-                <span style={{ color: '#7A2222', fontWeight: 600 }}>
+                <span style={{ color: 'var(--rose-fg)', fontWeight: 600 }}>
                   {atRiskCount} need{atRiskCount === 1 ? 's' : ''} attention
                 </span>
               </>
@@ -542,7 +542,7 @@ function PipelineFlow({
                   <span style={{
                     flex: 1,
                     height: 1,
-                    background: `linear-gradient(90deg, ${C.borderStrong}66, transparent)`,
+                    background: `linear-gradient(90deg, color-mix(in srgb, ${C.borderStrong} 40%, transparent), transparent)`,
                   }} aria-hidden="true" />
                 </div>
               ))}
@@ -666,7 +666,7 @@ function PipelineCell({
         border: `1px solid ${isAlert ? s.ring : 'transparent'}`,
         background: isEmpty
           ? 'transparent'
-          : `linear-gradient(180deg, ${s.bg} 0%, ${s.bg}88 100%)`,
+          : `linear-gradient(180deg, ${s.bg} 0%, color-mix(in srgb, ${s.bg} 50%, transparent) 100%)`,
         position: 'relative',
         cursor: 'pointer',
         fontFamily: 'inherit',
@@ -675,7 +675,7 @@ function PipelineCell({
         boxShadow: hover && !isEmpty
           ? `0 6px 16px rgba(0,0,0,0.08)`
           : isAlert
-            ? `0 0 0 4px ${s.bg}55`
+            ? `0 0 0 4px color-mix(in srgb, ${s.bg} 33%, transparent)`
             : 'none',
         transition: 'transform 160ms ease, box-shadow 160ms ease',
         opacity: isEmpty ? 0.55 : 1,
@@ -703,7 +703,7 @@ function PipelineCell({
             position: 'absolute', top: 10, right: 10,
             width: 8, height: 8, borderRadius: '50%',
             background: s.accent,
-            boxShadow: `0 0 0 4px ${s.bg}, 0 0 0 6px ${s.ring}88`,
+            boxShadow: `0 0 0 4px ${s.bg}, 0 0 0 6px color-mix(in srgb, ${s.ring} 50%, transparent)`,
             animation: 'alert-pulse 1.8s ease-in-out infinite',
             transformOrigin: 'center',
           }}
@@ -721,7 +721,7 @@ function PipelineCell({
       </div>
 
       <div style={{
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
         fontSize: 34,
         lineHeight: 1,
         fontWeight: 400,

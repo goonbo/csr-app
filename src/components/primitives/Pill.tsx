@@ -10,11 +10,11 @@ interface PillProps {
 }
 
 const tones: Record<PillTone, { bg: string; color: string; border: string }> = {
-  neutral:    { bg: C.oat,             color: C.inkLight,        border: C.borderStrong },
-  sage:       { bg: C.sageGlow,        color: C.sageDeep,        border: '#A8C09E' },
-  terracotta: { bg: C.terracottaGlow,  color: C.terracottaDeep,  border: '#D8A88E' },
-  amber:      { bg: '#F5E8C8',         color: '#6B4E1A',         border: '#D4B96A' },
-  rose:       { bg: '#F4D6D6',         color: '#7A2222',         border: '#D89494' },
+  neutral:    { bg: C.oat,                color: C.inkLight,          border: C.borderStrong },
+  sage:       { bg: C.sageGlow,           color: C.sageDeep,          border: C.sage },
+  terracotta: { bg: C.terracottaGlow,     color: C.terracottaDeep,    border: C.terracotta },
+  amber:      { bg: 'var(--amber-bg)',    color: 'var(--amber-fg)',   border: 'var(--amber)' },
+  rose:       { bg: 'var(--rose-bg)',     color: 'var(--rose-fg)',    border: 'var(--rose)' },
 };
 
 export function Pill({ children, tone = 'neutral', icon: Icon }: PillProps) {

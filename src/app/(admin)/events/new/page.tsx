@@ -78,7 +78,7 @@ export default function EventNewPage() {
                 background: 'transparent',
                 border: 'none',
                 resize: 'none',
-                fontFamily: 'var(--font-serif), serif',
+                fontFamily: 'var(--font-h1), sans-serif',
                 fontSize: 20,
                 color: C.ink,
                 lineHeight: 1.4,
@@ -188,7 +188,7 @@ export default function EventNewPage() {
                   Suggested capacity
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-serif), serif',
+                  fontFamily: 'var(--font-h1), sans-serif',
                   fontSize: 52, lineHeight: 1, color: C.ink,
                 }}>
                   {plan.capacity}

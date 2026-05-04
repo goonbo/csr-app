@@ -119,7 +119,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
                 What we accomplished
               </h2>
               <p style={{
-                fontFamily: 'var(--font-serif), serif',
+                fontFamily: 'var(--font-h1), sans-serif',
                 fontSize: 17, fontStyle: 'italic',
                 color: C.inkLight, lineHeight: 1.55,
                 margin: 0,
@@ -158,12 +158,12 @@ function AtRiskDiagnosis({
   options?: AtRiskOption[];
 }) {
   return (
-    <Card style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid #A33333` }}>
+    <Card style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid var(--rose)` }}>
       <div style={{ padding: '20px 28px', borderBottom: `1px solid ${C.border}` }}>
         <div style={{
           fontSize: 11, fontWeight: 700,
           textTransform: 'uppercase', letterSpacing: '0.06em',
-          color: '#7A2222', marginBottom: 4,
+          color: 'var(--rose-fg)', marginBottom: 4,
         }}>
           Why this might be at risk
         </div>
@@ -178,8 +178,8 @@ function AtRiskDiagnosis({
       }}>
         {diagnosis.map((d, i) => {
           const confTone =
-            d.confidence === 'high'   ? { bg: '#F4D6D6', color: '#7A2222', border: '#D89494' } :
-            d.confidence === 'medium' ? { bg: '#F5E8C8', color: '#6B4E1A', border: '#D4B96A' } :
+            d.confidence === 'high'   ? { bg: 'var(--rose-bg)', color: 'var(--rose-fg)', border: 'var(--rose)' } :
+            d.confidence === 'medium' ? { bg: 'var(--amber-bg)', color: 'var(--amber-fg)', border: 'var(--amber)' } :
             { bg: C.oat, color: C.inkLight, border: C.borderStrong };
           return (
             <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -228,8 +228,8 @@ function AtRiskDiagnosis({
             {options.map((opt, i) => {
               const tones = {
                 sage:  { dot: C.sage,    label: 'Cheapest move' },
-                amber: { dot: '#A87E2E', label: 'Worth weighing' },
-                rose:  { dot: '#A33333', label: 'Last resort' },
+                amber: { dot: 'var(--amber)', label: 'Worth weighing' },
+                rose:  { dot: 'var(--rose)', label: 'Last resort' },
               };
               const t = tones[opt.tone];
               return (
@@ -329,9 +329,9 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
               {m.label}
             </div>
             <div style={{
-              fontFamily: 'var(--font-serif), serif',
+              fontFamily: 'var(--font-h1), sans-serif',
               fontSize: 32, lineHeight: 1,
-              color: m.tone === 'sage' ? C.sage : m.tone === 'amber' ? '#6B4E1A' : C.ink,
+              color: m.tone === 'sage' ? C.sage : m.tone === 'amber' ? 'var(--amber-fg)' : C.ink,
               marginBottom: 4,
             }}>
               {m.value}
@@ -378,7 +378,7 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
 
         <div style={{ padding: '20px 28px 20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-            <AlertCircle size={13} color="#A87E2E" aria-hidden="true" />
+            <AlertCircle size={13} color="var(--amber)" aria-hidden="true" />
             <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>Supply check</span>
           </div>
           <div style={{
@@ -395,7 +395,7 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Backup task plan</span>
-              <span style={{ color: '#6B4E1A', fontWeight: 600 }}>Drafted</span>
+              <span style={{ color: 'var(--amber-fg)', fontWeight: 600 }}>Drafted</span>
             </div>
           </div>
         </div>
@@ -490,7 +490,7 @@ function StageNote({ event }: { event: EventType }) {
           {eyebrow}
         </div>
         <p style={{
-          fontFamily: 'var(--font-serif), serif',
+          fontFamily: 'var(--font-h1), sans-serif',
           fontSize: 17, fontStyle: 'italic',
           color: C.inkLight, lineHeight: 1.55,
           margin: 0,
@@ -653,7 +653,7 @@ function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliatio
                     padding: '5px 12px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
                     borderRadius: 999,
                     background: C.sageGlow, color: C.sageDeep,
-                    border: `1px solid #A8C09E`,
+                    border: `1px solid var(--accent)`,
                     cursor: 'pointer',
                   }}>
                     Mark attended
@@ -661,8 +661,8 @@ function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliatio
                   <button className="view-btn" style={{
                     padding: '5px 12px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
                     borderRadius: 999,
-                    background: '#F4D6D6', color: '#7A2222',
-                    border: `1px solid #D89494`,
+                    background: 'var(--rose-bg)', color: 'var(--rose-fg)',
+                    border: `1px solid var(--rose)`,
                     cursor: 'pointer',
                   }}>
                     No-show
@@ -699,7 +699,7 @@ function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliatio
                     <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{item.name}</span>
                     <span style={{ fontSize: 11, color: C.muted }}>{item.dept}</span>
                     <span style={{
-                      fontFamily: 'var(--font-serif), serif',
+                      fontFamily: 'var(--font-h1), sans-serif',
                       fontSize: 18, color: C.ink, marginLeft: 8,
                     }}>
                       {item.requested}
@@ -710,7 +710,7 @@ function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliatio
                       padding: '4px 10px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
                       borderRadius: 999,
                       background: C.sageGlow, color: C.sageDeep,
-                      border: `1px solid #A8C09E`,
+                      border: `1px solid var(--accent)`,
                       cursor: 'pointer',
                     }}>
                       Approve

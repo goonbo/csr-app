@@ -15,7 +15,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ greeting, title, subtitle, action, back, onBack }: PageHeaderProps) {
   return (
-    <div style={{ marginBottom: 40 }}>
+    <div style={{ marginBottom: 32 }}>
       {back && (
         <button
           onClick={onBack}
@@ -38,33 +38,34 @@ export function PageHeader({ greeting, title, subtitle, action, back, onBack }: 
           <ArrowLeft size={14} aria-hidden="true" /> {back}
         </button>
       )}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
         <div>
           {greeting && (
             <div style={{
-              fontFamily: 'var(--font-serif), serif',
-              fontStyle: 'italic',
-              fontSize: 15,
+              fontFamily: 'var(--greeting-font), sans-serif',
+              fontStyle: 'var(--greeting-style)' as React.CSSProperties['fontStyle'],
+              fontSize: 13,
               color: C.muted,
               marginBottom: 6,
+              letterSpacing: '0.01em',
             }}>
               {greeting}
             </div>
           )}
           <h1 style={{
-            fontFamily: 'var(--font-serif), serif',
-            fontSize: 38,
-            fontWeight: 400,
+            fontFamily: 'var(--font-h1), sans-serif',
+            fontSize: 'var(--h1-size)' as React.CSSProperties['fontSize'],
+            fontWeight: 'var(--h1-weight)' as React.CSSProperties['fontWeight'],
             color: C.ink,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.1,
+            letterSpacing: 'var(--h1-tracking)' as React.CSSProperties['letterSpacing'],
+            lineHeight: 1.05,
             margin: 0,
           }}>
             {title}
           </h1>
           {subtitle && (
             <p style={{
-              marginTop: 10,
+              marginTop: 12,
               fontSize: 14,
               color: C.inkLight,
               lineHeight: 1.55,

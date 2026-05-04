@@ -225,7 +225,7 @@ function UpcomingCard({ event, onClick }: { event: Event; onClick: () => void })
             {dateBits[0]}
           </div>
           <div style={{
-            fontFamily: 'var(--font-serif), serif',
+            fontFamily: 'var(--font-h1), sans-serif',
             fontSize: 20, lineHeight: 1,
           }}>
             {dateBits[1]}
@@ -288,7 +288,7 @@ function VTORing({ used, pool }: { used: number; pool: number }) {
           x={70} y={68} textAnchor="middle"
           style={{
             fontSize: 30,
-            fontFamily: 'var(--font-serif), serif',
+            fontFamily: 'var(--font-h1), sans-serif',
             fill: C.ink,
           }}
         >
@@ -328,7 +328,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ textAlign: 'center', flex: 1 }}>
       <div style={{
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
         fontSize: 22, lineHeight: 1,
         color: C.ink, marginBottom: 4,
       }}>
@@ -384,7 +384,7 @@ function RecentRow({ event, onClick }: { event: Event; onClick: () => void }) {
         </div>
       </div>
       <div style={{
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
         fontSize: 18, color: C.ink,
         flexShrink: 0,
       }}>

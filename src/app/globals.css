@@ -2,21 +2,132 @@
 
 * { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
-  padding: 0;
+html, body { margin: 0; padding: 0; }
+
+/* =========================================================
+   Theme tokens
+   ---------------------------------------------------------
+   :root        = Operator (default — admin chrome + dashboards)
+   [data-theme="blueprint"] = narrative pages (recap, reports)
+   [data-theme="pulse"]     = employee experience (chrome flips dark)
+   ========================================================= */
+
+:root,
+[data-theme="operator"] {
+  /* Surfaces */
+  --bg:           #FFFFFF;
+  --soft:         #F8FAFC;
+  --surface:      #FFFFFF;
+
+  /* Type */
+  --ink:          #0A1A2E;   /* primary text — brand anchor */
+  --ink-light:    #1E293B;   /* body */
+  --ink-muted:    #475569;   /* secondary, ~7:1 on white */
+  --ink-faint:    #94A3B8;   /* tertiary, large-text only */
+
+  /* Action / accent — cyan does all brand work */
+  --accent:       #0891B2;
+  --accent-hover: #0E4F65;
+  --accent-deep:  #0E4F65;
+  --accent-glow:  rgba(8, 145, 178, 0.10);
+
+  /* Structure */
+  --border:        #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Functional — base + bg/fg pairs for tinted pills */
+  --rose:    #DC2626;
+  --rose-bg: #FEE2E2;
+  --rose-fg: #991B1B;
+  --amber:   #D97706;
+  --amber-bg: #FEF3C7;
+  --amber-fg: #92400E;
+  --emerald: #16A34A;
+  --emerald-bg: #DCFCE7;
+  --emerald-fg: #166534;
+
+  /* Focus ring */
+  --focus: #0891B2;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius:    6px;
+  --radius-lg: 8px;
+
+  /* H1 — operator uses sans, dense */
+  --font-h1:        var(--font-sans);
+  --h1-size:        28px;
+  --h1-weight:      600;
+  --h1-tracking:    -0.02em;
+  --greeting-style: italic;
+  --greeting-font:  var(--font-sans);
 }
 
+[data-theme="blueprint"] {
+  --bg:           #F5F7FA;
+  --soft:         #EAEEF5;
+  --surface:      #FFFFFF;
+
+  --ink:          #0A1A2E;
+  --ink-light:    #1E293B;
+  --ink-muted:    #5C6677;
+  --ink-faint:    #94A3B8;
+
+  --accent:       #0891B2;
+  --accent-hover: #0E4F65;
+  --accent-deep:  #0E4F65;
+  --accent-glow:  #E0F2FE;
+
+  --border:        #CBD5E1;
+  --border-strong: #94A3B8;
+
+  --rose:    #DC2626;
+  --rose-bg: #FEE2E2;
+  --rose-fg: #991B1B;
+  --amber:   #D97706;
+  --amber-bg: #FEF3C7;
+  --amber-fg: #92400E;
+  --emerald: #16A34A;
+  --emerald-bg: #DCFCE7;
+  --emerald-fg: #166534;
+
+  --focus: #0891B2;
+
+  --radius-sm: 4px;
+  --radius:    8px;
+  --radius-lg: 12px;
+
+  /* H1 — blueprint goes serif, big */
+  --font-h1:        var(--font-serif);
+  --h1-size:        56px;
+  --h1-weight:      350;
+  --h1-tracking:    -0.025em;
+  --greeting-style: italic;
+  --greeting-font:  var(--font-serif);
+}
+
+/* =========================================================
+   Base styles
+   ========================================================= */
+
 body {
-  font-family: var(--font-sans), 'DM Sans', system-ui, -apple-system, sans-serif;
-  background: #F8F4ED; /* C.cream */
-  color: #1F1B16; /* C.ink */
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   font-size: 14px;
   min-height: 100vh;
 }
 
-/* GLOBAL FOCUS STATES — visible keyboard navigation, terracotta @ 5:1 on cream */
+[data-theme="blueprint"] {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* =========================================================
+   Focus states — visible keyboard nav, theme-aware
+   ========================================================= */
+
 .view-btn:focus-visible,
 .view-interactive:focus-visible,
 .view-input:focus-visible,
@@ -24,43 +135,49 @@ button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible,
 details > summary:focus-visible {
-  outline: 2px solid #A0533C; /* C.focus */
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 
 .view-input:focus {
-  border-color: #3F5A3F !important; /* C.sage */
-  outline: 2px solid #A0533C; /* C.focus */
+  border-color: var(--accent) !important;
+  outline: 2px solid var(--focus);
   outline-offset: 0;
 }
 
-/* Remove default focus ring only when not visible */
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible),
 [role="button"]:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* =========================================================
+   Motion
+   ========================================================= */
+
 @keyframes spin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @keyframes alert-pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
+  0%, 100% { transform: scale(1);    opacity: 1;   }
   50%      { transform: scale(1.25); opacity: 0.7; }
 }
 
-details summary::-webkit-details-marker { display: none; }
-details summary::marker { display: none; }
-
-::placeholder { color: #6B6457; opacity: 1; } /* C.muted */
-
-/* Reduced motion respect */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
+
+/* =========================================================
+   Misc resets
+   ========================================================= */
+
+details summary::-webkit-details-marker { display: none; }
+details summary::marker { display: none; }
+
+::placeholder { color: var(--ink-muted); opacity: 1; }
