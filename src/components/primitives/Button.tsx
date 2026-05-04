@@ -35,12 +35,12 @@ const variants: Record<ButtonVariant, { background: string; color: string; borde
     background: C.terracotta,
     color: '#FFFFFF',
     border: `1px solid ${C.terracotta}`,
-    hoverBg: '#B05E45',
+    hoverBg: C.terracottaDeep,
   },
   soft: {
-    background: '#FFFFFF',
+    background: C.paper,
     color: C.ink,
-    border: `1px solid ${C.borderStrong}`,
+    border: `1px solid ${C.border}`,
     hoverBg: C.oat,
   },
   ghost: {
@@ -93,9 +93,9 @@ export function Button({
         color: v.color,
         border: v.border,
         boxShadow:
-          variant === 'primary' ? '0 1px 2px rgba(63,90,63,0.2)' :
-          variant === 'accent'  ? '0 1px 2px rgba(160,83,60,0.2)' :
-          variant === 'ai'      ? '0 2px 8px rgba(63,90,63,0.25)' :
+          variant === 'primary' ? '0 1px 2px rgba(10,26,46,0.10)' :
+          variant === 'accent'  ? '0 1px 2px rgba(10,26,46,0.10)' :
+          variant === 'ai'      ? `0 0 0 4px ${C.sageGlow}` :
           'none',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,

@@ -35,10 +35,16 @@ html, body { margin: 0; padding: 0; }
   --border:        #E2E8F0;
   --border-strong: #CBD5E1;
 
-  /* Functional */
+  /* Functional — base + bg/fg pairs for tinted pills */
   --rose:    #DC2626;
+  --rose-bg: #FEE2E2;
+  --rose-fg: #991B1B;
   --amber:   #D97706;
+  --amber-bg: #FEF3C7;
+  --amber-fg: #92400E;
   --emerald: #16A34A;
+  --emerald-bg: #DCFCE7;
+  --emerald-fg: #166534;
 
   /* Focus ring */
   --focus: #0891B2;
@@ -46,7 +52,15 @@ html, body { margin: 0; padding: 0; }
   /* Radii */
   --radius-sm: 4px;
   --radius:    6px;
-  --radius-lg: 12px;
+  --radius-lg: 8px;
+
+  /* H1 — operator uses sans, dense */
+  --font-h1:        var(--font-sans);
+  --h1-size:        28px;
+  --h1-weight:      600;
+  --h1-tracking:    -0.02em;
+  --greeting-style: italic;
+  --greeting-font:  var(--font-sans);
 }
 
 [data-theme="blueprint"] {
@@ -67,11 +81,29 @@ html, body { margin: 0; padding: 0; }
   --border:        #CBD5E1;
   --border-strong: #94A3B8;
 
+  --rose:    #DC2626;
+  --rose-bg: #FEE2E2;
+  --rose-fg: #991B1B;
+  --amber:   #D97706;
+  --amber-bg: #FEF3C7;
+  --amber-fg: #92400E;
+  --emerald: #16A34A;
+  --emerald-bg: #DCFCE7;
+  --emerald-fg: #166534;
+
   --focus: #0891B2;
 
   --radius-sm: 4px;
   --radius:    8px;
   --radius-lg: 12px;
+
+  /* H1 — blueprint goes serif, big */
+  --font-h1:        var(--font-serif);
+  --h1-size:        56px;
+  --h1-weight:      350;
+  --h1-tracking:    -0.025em;
+  --greeting-style: italic;
+  --greeting-font:  var(--font-serif);
 }
 
 [data-theme="pulse"] {
@@ -94,14 +126,28 @@ html, body { margin: 0; padding: 0; }
   --border-strong: #2A4258;
 
   --rose:    #F87171;
+  --rose-bg: rgba(248, 113, 113, 0.14);
+  --rose-fg: #FCA5A5;
   --amber:   #FBBF24;
+  --amber-bg: rgba(251, 191, 36, 0.14);
+  --amber-fg: #FDE68A;
   --emerald: #34D399;
+  --emerald-bg: rgba(52, 211, 153, 0.14);
+  --emerald-fg: #6EE7B7;
 
   --focus: #5EEAD4;
 
   --radius-sm: 6px;
-  --radius:    8px;
+  --radius:    10px;
   --radius-lg: 14px;
+
+  /* H1 — pulse uses display, big */
+  --font-h1:        var(--font-display);
+  --h1-size:        52px;
+  --h1-weight:      600;
+  --h1-tracking:    -0.03em;
+  --greeting-style: normal;
+  --greeting-font:  var(--font-sans);
 }
 
 /* =========================================================

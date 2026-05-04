@@ -50,7 +50,7 @@ export function Card({
       aria-label={ariaLabel}
       className={interactive ? 'view-interactive' : ''}
       style={{
-        borderRadius: 16,
+        borderRadius: 'var(--radius-lg)' as React.CSSProperties['borderRadius'],
         background: ai ? C.sageGlow : (soft ? C.oat : C.paper),
         // Per-side shorthands instead of the `border` parent shorthand, so
         // callers can override one side via `borderLeft`/`borderTop` without
