@@ -1,20 +1,34 @@
 import type { Metadata } from 'next';
-import { Instrument_Serif, DM_Sans } from 'next/font/google';
-import { TopNav } from '@/components/layout/TopNav';
+import {
+  Inter_Tight,
+  Fraunces,
+  JetBrains_Mono,
+  Bricolage_Grotesque,
+} from 'next/font/google';
 import './globals.css';
 
-const serif = Instrument_Serif({
-  weight: '400',
-  style: ['normal', 'italic'],
+const sans = Inter_Tight({
   subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const serif = Fraunces({
+  subsets: ['latin'],
+  axes: ['opsz', 'SOFT'],
   variable: '--font-serif',
   display: 'swap',
 });
 
-const sans = DM_Sans({
-  weight: ['300', '400', '500', '600', '700'],
+const mono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+const display = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -27,16 +41,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
-      <body>
-        <TopNav />
-        <main
-          className="px-4 sm:px-6 md:px-8 py-8 md:py-10"
-          style={{ maxWidth: 1280, margin: '0 auto' }}
-        >
-          {children}
-        </main>
-      </body>
+    <html
+      lang="en"
+      className={`${sans.variable} ${serif.variable} ${mono.variable} ${display.variable}`}
+    >
+      <body>{children}</body>
     </html>
   );
 }

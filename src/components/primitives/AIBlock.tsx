@@ -16,8 +16,8 @@ export function AIBlock({ children, label = 'AI-generated', onRegen }: AIBlockPr
       position: 'relative',
       borderRadius: 12,
       padding: 16,
-      background: `linear-gradient(135deg, ${C.sageGlow}cc, ${C.sageGlow}55)`,
-      border: `1px solid #A8C09E`,
+      background: `linear-gradient(135deg, ${C.sageGlow}, color-mix(in srgb, ${C.sageGlow} 50%, transparent))`,
+      border: `1px solid ${C.sage}`,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <span style={{

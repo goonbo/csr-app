@@ -542,7 +542,7 @@ function PipelineFlow({
                   <span style={{
                     flex: 1,
                     height: 1,
-                    background: `linear-gradient(90deg, ${C.borderStrong}66, transparent)`,
+                    background: `linear-gradient(90deg, color-mix(in srgb, ${C.borderStrong} 40%, transparent), transparent)`,
                   }} aria-hidden="true" />
                 </div>
               ))}
