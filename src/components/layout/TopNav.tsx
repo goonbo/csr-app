@@ -82,8 +82,8 @@ export function TopNav() {
             <img
               src="/view-logo.png"
               alt=""
-              width={28}
-              height={28}
+              width={32}
+              height={32}
               style={{ display: 'block', flexShrink: 0 }}
             />
             <span style={{
