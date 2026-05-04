@@ -231,7 +231,7 @@ function MutualFitPanel({ minGroup, maxGroup }: { minGroup: number; maxGroup: nu
               {f.label}
             </div>
             <div style={{
-              fontFamily: 'var(--font-serif), serif',
+              fontFamily: 'var(--font-h1), sans-serif',
               fontSize: 22, lineHeight: 1,
               color: f.tone === 'sage' ? C.sageDeep : '#6B4E1A',
               marginBottom: 8,

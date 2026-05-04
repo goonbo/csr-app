@@ -169,7 +169,7 @@ export default function OpportunitiesPage() {
         textAlign: 'center',
       }}>
         <div style={{
-          fontFamily: 'var(--font-serif), serif',
+          fontFamily: 'var(--font-h1), sans-serif',
           fontSize: 18, color: C.ink, fontStyle: 'italic',
           marginBottom: 6,
         }}>
@@ -251,7 +251,7 @@ function OpportunityCard({
           )}
         </div>
         <div style={{
-          fontFamily: 'var(--font-serif), serif',
+          fontFamily: 'var(--font-h1), sans-serif',
           fontSize: 22, lineHeight: 1.2, fontWeight: 400,
         }}>
           {event.title}

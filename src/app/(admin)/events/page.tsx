@@ -154,7 +154,7 @@ export default function EventsListPage() {
 
               {/* Title */}
               <h2 style={{
-                fontFamily: 'var(--font-serif), serif',
+                fontFamily: 'var(--font-h1), sans-serif',
                 fontSize: 22, fontWeight: 400,
                 color: C.ink, lineHeight: 1.2,
                 marginBottom: 4, marginTop: 0,

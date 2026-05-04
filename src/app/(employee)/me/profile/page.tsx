@@ -83,7 +83,7 @@ export default function EmployeeProfilePage() {
                   Hours given · this year
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-serif), serif',
+                  fontFamily: 'var(--font-h1), sans-serif',
                   fontSize: 64, lineHeight: 1, color: C.ink,
                   fontVariantNumeric: 'tabular-nums',
                 }}>
@@ -108,7 +108,7 @@ export default function EmployeeProfilePage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: 'white',
                   fontSize: 28, fontWeight: 600,
-                  fontFamily: 'var(--font-serif), serif',
+                  fontFamily: 'var(--font-h1), sans-serif',
                   flexShrink: 0,
                 }}
               >
@@ -151,7 +151,7 @@ export default function EmployeeProfilePage() {
                           {b.cause}
                         </div>
                         <span style={{
-                          fontFamily: 'var(--font-serif), serif',
+                          fontFamily: 'var(--font-h1), sans-serif',
                           fontSize: 16, color: C.ink,
                           fontVariantNumeric: 'tabular-nums',
                         }}>
@@ -271,7 +271,7 @@ export default function EmployeeProfilePage() {
             <div style={{
               fontSize: 13, color: C.ink, lineHeight: 1.55,
             }}>
-              <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: 16, fontStyle: 'italic' }}>
+              <span style={{ fontFamily: 'var(--font-h1), sans-serif', fontSize: 16, fontStyle: 'italic' }}>
                 {EMPLOYEE_SIGNALS.preferredFormat}.
               </span>
               <div style={{

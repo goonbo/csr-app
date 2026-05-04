@@ -311,7 +311,7 @@ export default function AdminHomePage() {
                         {dateBits[0]}
                       </div>
                       <div style={{
-                        fontFamily: 'var(--font-serif), serif',
+                        fontFamily: 'var(--font-h1), sans-serif',
                         fontSize: 20, lineHeight: 1,
                       }}>
                         {dateBits[1]}
@@ -376,7 +376,7 @@ export default function AdminHomePage() {
                     </div>
                   </div>
                   <div style={{
-                    fontFamily: 'var(--font-serif), serif',
+                    fontFamily: 'var(--font-h1), sans-serif',
                     fontSize: 24, color: C.ink, lineHeight: 1,
                   }}>
                     {k.value}
@@ -721,7 +721,7 @@ function PipelineCell({
       </div>
 
       <div style={{
-        fontFamily: 'var(--font-serif), serif',
+        fontFamily: 'var(--font-h1), sans-serif',
         fontSize: 34,
         lineHeight: 1,
         fontWeight: 400,

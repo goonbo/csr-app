@@ -48,7 +48,7 @@ export function DemandSignalsPanel() {
               <div key={c.cause} style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                 <div style={{ flex: '0 0 140px', display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{
-                    fontFamily: 'var(--font-serif), serif',
+                    fontFamily: 'var(--font-h1), sans-serif',
                     fontSize: 22, color: C.ink, lineHeight: 1,
                   }}>
                     {c.strength}

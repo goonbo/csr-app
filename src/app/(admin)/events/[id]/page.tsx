@@ -119,7 +119,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
                 What we accomplished
               </h2>
               <p style={{
-                fontFamily: 'var(--font-serif), serif',
+                fontFamily: 'var(--font-h1), sans-serif',
                 fontSize: 17, fontStyle: 'italic',
                 color: C.inkLight, lineHeight: 1.55,
                 margin: 0,
@@ -329,7 +329,7 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
               {m.label}
             </div>
             <div style={{
-              fontFamily: 'var(--font-serif), serif',
+              fontFamily: 'var(--font-h1), sans-serif',
               fontSize: 32, lineHeight: 1,
               color: m.tone === 'sage' ? C.sage : m.tone === 'amber' ? '#6B4E1A' : C.ink,
               marginBottom: 4,
@@ -490,7 +490,7 @@ function StageNote({ event }: { event: EventType }) {
           {eyebrow}
         </div>
         <p style={{
-          fontFamily: 'var(--font-serif), serif',
+          fontFamily: 'var(--font-h1), sans-serif',
           fontSize: 17, fontStyle: 'italic',
           color: C.inkLight, lineHeight: 1.55,
           margin: 0,
@@ -699,7 +699,7 @@ function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliatio
                     <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{item.name}</span>
                     <span style={{ fontSize: 11, color: C.muted }}>{item.dept}</span>
                     <span style={{
-                      fontFamily: 'var(--font-serif), serif',
+                      fontFamily: 'var(--font-h1), sans-serif',
                       fontSize: 18, color: C.ink, marginLeft: 8,
                     }}>
                       {item.requested}
