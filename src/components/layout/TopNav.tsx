@@ -78,33 +78,14 @@ export function TopNav() {
             }}
             aria-label="VIEW home"
           >
-            {/* Logo mark — small square with the brand cyan gradient + dot motif */}
-            <span
-              aria-hidden="true"
-              style={{
-                position: 'relative',
-                width: 24, height: 24, borderRadius: 6,
-                background: `linear-gradient(135deg, ${C.ink} 0%, #1E40AF 35%, ${C.sage} 75%, ${C.sageLight} 100%)`,
-                boxShadow: `0 0 0 1px ${C.border}, 0 0 12px ${C.sageGlow}`,
-                flexShrink: 0,
-              }}
-            >
-              <span
-                style={{
-                  position: 'absolute', top: 4, right: 4,
-                  width: 4, height: 4, borderRadius: '50%',
-                  background: '#5EEAD4',
-                  boxShadow: '0 0 6px rgba(94, 234, 212, 0.8)',
-                }}
-              />
-              <span
-                style={{
-                  position: 'absolute', bottom: 5, left: 5,
-                  width: 3, height: 3, borderRadius: '50%',
-                  background: '#22D3EE',
-                }}
-              />
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/view-logo.png"
+              alt=""
+              width={28}
+              height={28}
+              style={{ display: 'block', flexShrink: 0 }}
+            />
             <span style={{
               fontSize: 15,
               fontWeight: 700,
