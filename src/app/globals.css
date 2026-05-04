@@ -106,50 +106,6 @@ html, body { margin: 0; padding: 0; }
   --greeting-font:  var(--font-serif);
 }
 
-[data-theme="pulse"] {
-  --bg:           #050D17;
-  --soft:         #0F1B2D;
-  --surface:      #0F1B2D;
-  --surface-lift: #172A40;
-
-  --ink:          #F8FAFC;
-  --ink-light:    #CBD5E1;
-  --ink-muted:    #94A3B8;
-  --ink-faint:    #64748B;
-
-  --accent:       #22D3EE;
-  --accent-hover: #5EEAD4;
-  --accent-deep:  #5EEAD4;
-  --accent-glow:  rgba(34, 211, 238, 0.12);
-
-  --border:        #1E3349;
-  --border-strong: #2A4258;
-
-  --rose:    #F87171;
-  --rose-bg: rgba(248, 113, 113, 0.14);
-  --rose-fg: #FCA5A5;
-  --amber:   #FBBF24;
-  --amber-bg: rgba(251, 191, 36, 0.14);
-  --amber-fg: #FDE68A;
-  --emerald: #34D399;
-  --emerald-bg: rgba(52, 211, 153, 0.14);
-  --emerald-fg: #6EE7B7;
-
-  --focus: #5EEAD4;
-
-  --radius-sm: 6px;
-  --radius:    10px;
-  --radius-lg: 14px;
-
-  /* H1 — pulse uses display, big */
-  --font-h1:        var(--font-display);
-  --h1-size:        52px;
-  --h1-weight:      600;
-  --h1-tracking:    -0.03em;
-  --greeting-style: normal;
-  --greeting-font:  var(--font-sans);
-}
-
 /* =========================================================
    Base styles
    ========================================================= */
@@ -161,15 +117,6 @@ body {
   -webkit-font-smoothing: antialiased;
   font-size: 14px;
   min-height: 100vh;
-}
-
-/* Pulse-themed scopes paint their own bg over the body so the dark
-   surface fills the viewport even when the wrapper doesn't. */
-[data-theme="pulse"] {
-  background: var(--bg);
-  color: var(--ink);
-  min-height: 100vh;
-  position: relative;
 }
 
 [data-theme="blueprint"] {

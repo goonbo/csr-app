@@ -16,10 +16,9 @@ Two rebuilt directions, each anchored on the brand navy + cyan logo:
 
 The original plan included a third theme (Pulse — deep navy, dot field,
 Bricolage display) for the employee side. Pivoted 2026-05-04 in favor of
-admin/employee parity. Pulse CSS scope and font are kept in
-`globals.css` and `layout.tsx` for now in case it's wanted back; the
-blend preview at `public/_preview/blend.html` documents what it looked
-like.
+admin/employee parity, then removed entirely from the live code. The
+blend preview at `public/_preview/blend.html` is the only place it
+still exists, as historical reference.
 
 ## Token system
 
@@ -51,7 +50,6 @@ variables for theme-level selection.
 | `--font-sans`   | Inter Tight (var.)    | UI labels, body, all chrome          |
 | `--font-serif`  | Fraunces (var. opsz)  | Blueprint hero + KPI numerals        |
 | `--font-mono`   | JetBrains Mono        | Operator tabular nums, IDs, timestamps |
-| `--font-display`| Bricolage Grotesque (var.) | Pulse hero copy                |
 
 ## Migration history
 

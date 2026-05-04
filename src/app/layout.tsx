@@ -1,10 +1,5 @@
 import type { Metadata } from 'next';
-import {
-  Inter_Tight,
-  Fraunces,
-  JetBrains_Mono,
-  Bricolage_Grotesque,
-} from 'next/font/google';
+import { Inter_Tight, Fraunces, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
 const sans = Inter_Tight({
@@ -26,12 +21,6 @@ const mono = JetBrains_Mono({
   display: 'swap',
 });
 
-const display = Bricolage_Grotesque({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
   title: 'VIEW',
   description: 'AI-native CSR operator platform for mid-market companies.',
@@ -43,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${serif.variable} ${mono.variable} ${display.variable}`}
+      className={`${sans.variable} ${serif.variable} ${mono.variable}`}
     >
       <body>{children}</body>
     </html>
