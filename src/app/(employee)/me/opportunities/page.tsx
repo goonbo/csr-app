@@ -309,7 +309,7 @@ function OpportunityCard({
               <div style={{
                 width: `${Math.min(100, fillPct)}%`,
                 height: '100%',
-                background: event.pipeline === 'at-risk' ? '#A33333' : C.sage,
+                background: event.pipeline === 'at-risk' ? 'var(--rose)' : C.sage,
                 transition: 'width 200ms ease',
               }} />
             </div>
@@ -342,7 +342,7 @@ function OpportunityCard({
                 cursor: 'pointer',
                 background: isSignedUp ? C.sageGlow : C.terracotta,
                 color: isSignedUp ? C.sageDeep : 'white',
-                border: isSignedUp ? `1px solid #A8C09E` : 'none',
+                border: isSignedUp ? `1px solid var(--accent)` : 'none',
                 display: 'inline-flex',
                 alignItems: 'center', justifyContent: 'center',
                 gap: 6,

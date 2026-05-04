@@ -107,7 +107,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                   width: 56, height: 56, borderRadius: '50%',
                   margin: '0 auto 16px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: `linear-gradient(135deg, ${C.sageGlow}, #B5CDAD)`,
+                  background: `linear-gradient(135deg, ${C.sageGlow}, var(--accent-hover))`,
                 }}
                 aria-hidden="true"
               >
@@ -218,14 +218,14 @@ function MutualFitPanel({ minGroup, maxGroup }: { minGroup: number; maxGroup: nu
             style={{
               padding: 16,
               borderRadius: 12,
-              background: f.tone === 'sage' ? C.sageGlow : '#F5E8C8',
-              border: `1px solid ${f.tone === 'sage' ? '#A8C09E' : '#D4B96A'}`,
+              background: f.tone === 'sage' ? C.sageGlow : 'var(--amber-bg)',
+              border: `1px solid ${f.tone === 'sage' ? 'var(--accent)' : 'var(--amber)'}`,
             }}
           >
             <div style={{
               fontSize: 10, fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.06em',
-              color: f.tone === 'sage' ? C.sageDeep : '#6B4E1A',
+              color: f.tone === 'sage' ? C.sageDeep : 'var(--amber-fg)',
               marginBottom: 6,
             }}>
               {f.label}
@@ -233,14 +233,14 @@ function MutualFitPanel({ minGroup, maxGroup }: { minGroup: number; maxGroup: nu
             <div style={{
               fontFamily: 'var(--font-h1), sans-serif',
               fontSize: 22, lineHeight: 1,
-              color: f.tone === 'sage' ? C.sageDeep : '#6B4E1A',
+              color: f.tone === 'sage' ? C.sageDeep : 'var(--amber-fg)',
               marginBottom: 8,
             }}>
               {f.score}
             </div>
             <p style={{
               fontSize: 12, lineHeight: 1.5,
-              color: f.tone === 'sage' ? C.sageDeep : '#6B4E1A',
+              color: f.tone === 'sage' ? C.sageDeep : 'var(--amber-fg)',
               margin: 0,
             }}>
               {f.body}
@@ -302,7 +302,7 @@ function DiligenceOverview({ diligence }: { diligence: Diligence }) {
           padding: 14,
           borderRadius: 12,
           background: C.sageGlow,
-          border: `1px solid #A8C09E`,
+          border: `1px solid var(--accent)`,
           marginBottom: 24,
         }}
       >
@@ -387,9 +387,9 @@ function DiligenceOverview({ diligence }: { diligence: Diligence }) {
               {diligence.alternativesConsidered.map((alt, i) => {
                 const fitTone =
                   alt.fit === 'Possible'
-                    ? { bg: C.sageGlow, color: C.sageDeep, border: '#A8C09E' }
+                    ? { bg: C.sageGlow, color: C.sageDeep, border: 'var(--accent)' }
                     : alt.fit === 'Worth considering'
-                    ? { bg: '#F5E8C8', color: '#6B4E1A', border: '#D4B96A' }
+                    ? { bg: 'var(--amber-bg)', color: 'var(--amber-fg)', border: 'var(--amber)' }
                     : { bg: C.oat, color: C.inkLight, border: C.borderStrong };
                 return (
                   <div
@@ -554,7 +554,7 @@ function ContactCard({
           style={{
             width: 40, height: 40, borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: `linear-gradient(135deg, ${C.terracotta}, #B96B52)`,
+            background: `linear-gradient(135deg, ${C.terracotta}, var(--accent-deep))`,
             color: 'white', fontSize: 12, fontWeight: 600,
           }}
           aria-label={`${contact} avatar`}

@@ -134,7 +134,7 @@ export function DemandSignalsPanel() {
         <div style={{
           padding: '14px 28px',
           background: C.terracottaGlow,
-          borderTop: `1px solid #D8A88E`,
+          borderTop: `1px solid var(--accent)`,
           display: 'flex',
           alignItems: 'flex-start',
           gap: 10,

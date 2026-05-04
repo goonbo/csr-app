@@ -9,9 +9,9 @@ interface ReadinessTagProps {
 }
 
 const tones = {
-  sage:    { bg: C.sageGlow, color: C.sageDeep,  border: '#A8C09E' },
-  amber:   { bg: '#F5E8C8',  color: '#6B4E1A',   border: '#D4B96A' },
-  neutral: { bg: C.oat,      color: C.inkLight,  border: C.borderStrong },
+  sage:    { bg: C.sageGlow,           color: C.sageDeep,         border: C.sage },
+  amber:   { bg: 'var(--amber-bg)',    color: 'var(--amber-fg)',  border: 'var(--amber)' },
+  neutral: { bg: C.oat,                color: C.inkLight,         border: C.borderStrong },
 };
 
 export function ReadinessTag({ tag, score, size = 'md' }: ReadinessTagProps) {
