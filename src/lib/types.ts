@@ -12,6 +12,153 @@ export type Workspace =
 // migrated from elsewhere (Salesforce, spreadsheets, etc.).
 export type DataSource = 'view-partner' | 'direct' | 'imported';
 
+// ============================================================
+// Nonprofit-side data shapes
+// ============================================================
+
+export interface VolunteerSkill {
+  label: string;
+  source: DataSource;
+}
+
+export interface VolunteerNote {
+  id: string;
+  date: string;
+  author: string;
+  body: string;
+}
+
+export interface VolunteerEvent {
+  id: string;          // links to Event when applicable
+  date: string;
+  title: string;
+  partner: string | null; // corporate partner name (null for community-direct events)
+  hours: number;
+  source: DataSource;     // VIEW-confirmed via corporate scanner vs. logged here
+}
+
+export interface Volunteer {
+  id: string;
+  name: string;
+  employer: string | null;       // null for community volunteers
+  email: string;
+  phone?: string;
+  totalHours: number;
+  eventsAttended: number;
+  lastActive: string;            // ISO date
+  source: DataSource;
+  sourcePartnerId?: string;      // CorporatePartner.id when source === 'view-partner'
+  status: 'active' | 'inactive';
+  recognitions: RecognitionId[];
+  skills: VolunteerSkill[];
+  notes: VolunteerNote[];
+  history: VolunteerEvent[];
+  joinedAt: string;
+}
+
+export type RecognitionId =
+  | '10-events' | '25-events' | '50-events'
+  | 'first-skills-based' | 'spanish-speaker' | 'recurring-donor';
+
+export interface PartnerEvent {
+  id: string;
+  date: string;
+  title: string;
+  attended: number;
+  hours: number;
+  outputs: string;
+}
+
+export interface CommLogEntry {
+  date: string;
+  author: string;
+  body: string;
+}
+
+export interface PendingRequest {
+  proposedTitle: string;
+  proposedDate: string;
+  proposedTime: string;
+  proposedCapacity: number;
+  capacityFitReasoning: string;  // shown to nonprofit, comes from VIEW
+  cause: Cause;
+  vto: boolean;
+  fromEventId?: string;          // links to existing Event when this is a real proposal
+}
+
+export interface CorporatePartner {
+  id: string;
+  name: string;
+  industry: string;
+  contactName: string;
+  contactEmail: string;
+  source: DataSource;
+  relationshipHealth: 'thriving' | 'steady' | 'at-risk';
+  yearsActive: number;
+  eventsHostedYtd: number;
+  hoursHostedYtd: number;
+  cashDonatedYtd: number;
+  lastActivityAt: string;
+  formatMix: { directService: number; skillsBased: number; grantsOnly: number };
+  pendingRequest?: PendingRequest;
+  history: PartnerEvent[];
+  commLog: CommLogEntry[];
+  preferences: string[];
+}
+
+export interface Donation {
+  id: string;
+  donorName: string;
+  donorType: 'individual' | 'corporate';
+  donorId?: string;              // links to Volunteer.id or CorporatePartner.id
+  amount: number;
+  date: string;
+  designation: string;
+  source: DataSource;
+  sourcePartnerId?: string;      // for VIEW corporate matching donations
+  acknowledged: boolean;
+  recurring: boolean;
+}
+
+export interface InKindDonation {
+  id: string;
+  description: string;
+  donorName: string;
+  donorType: 'individual' | 'corporate';
+  donorId?: string;
+  estimatedValue: number;
+  receivedDate: string;
+  status: 'received' | 'valued' | 'distributed';
+  source: DataSource;
+  sourcePartnerId?: string;
+  quantity?: string;
+}
+
+export interface NonprofitOutput {
+  metric: string;
+  value: string;
+}
+
+export interface NonprofitVoice {
+  quote: string;
+  who: string;
+}
+
+export interface NonprofitAsk {
+  type: 'skills' | 'funding' | 'capacity';
+  title: string;
+  body: string;
+}
+
+export interface NonprofitRecap {
+  eventId: string;               // links to existing Event.id
+  ourFraming: string;
+  outputs: NonprofitOutput[];
+  voices: NonprofitVoice[];
+  partnershipReflection: string;
+  asks: NonprofitAsk[];
+}
+
 export type ReadinessTagId =
   | 'strong' | 'solid' | 'closer-look' | 'limited' | 'not-assessed';
 
