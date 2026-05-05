@@ -7,9 +7,9 @@ html, body { margin: 0; padding: 0; }
 /* =========================================================
    Theme tokens
    ---------------------------------------------------------
-   :root        = Operator (default — admin chrome + dashboards)
+   :root        = Operator (default — corporate chrome + dashboards)
    [data-theme="blueprint"] = narrative pages (recap, reports)
-   [data-theme="pulse"]     = employee experience (chrome flips dark)
+   [data-theme="field"]     = nonprofit workspace (emerald accent)
    ========================================================= */
 
 :root,
@@ -45,6 +45,16 @@ html, body { margin: 0; padding: 0; }
   --emerald: #16A34A;
   --emerald-bg: #DCFCE7;
   --emerald-fg: #166534;
+
+  /* VIEW source — the "foreign here" tone that marks data flowing
+     between corporate workspaces and nonprofit workspaces. Cyan in
+     both directions; the meaning lives in the surrounding theme.
+     In Field, cyan reads as foreign (emerald is local). In Operator,
+     this is the same as --accent, so consumers should rely on
+     additional differentiation (sparkle icon, label). */
+  --view-source:    #0891B2;
+  --view-source-bg: #E0F2FE;
+  --view-source-fg: #0E4F65;
 
   /* Focus ring */
   --focus: #0891B2;
@@ -104,6 +114,64 @@ html, body { margin: 0; padding: 0; }
   --h1-tracking:    -0.025em;
   --greeting-style: italic;
   --greeting-font:  var(--font-serif);
+}
+
+[data-theme="field"] {
+  /* Surfaces — identical to Operator. The point of Field is that
+     it lives inside the same product, just with a different accent. */
+  --bg:           #FFFFFF;
+  --soft:         #F8FAFC;
+  --surface:      #FFFFFF;
+
+  /* Type — identical to Operator */
+  --ink:          #0A1A2E;
+  --ink-light:    #1E293B;
+  --ink-muted:    #475569;
+  --ink-faint:    #94A3B8;
+
+  /* Accent flips: emerald instead of cyan. This is the single
+     visible signal that you're in a different workspace. */
+  --accent:       #16A34A;   /* ~5.1:1 on white — AA on UI text 14px+ */
+  --accent-hover: #15803D;
+  --accent-deep:  #14532D;
+  --accent-glow:  rgba(22, 163, 74, 0.10);
+
+  /* Structure — identical to Operator */
+  --border:        #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Functional — same scale */
+  --rose:    #DC2626;
+  --rose-bg: #FEE2E2;
+  --rose-fg: #991B1B;
+  --amber:   #D97706;
+  --amber-bg: #FEF3C7;
+  --amber-fg: #92400E;
+  --emerald: #16A34A;
+  --emerald-bg: #DCFCE7;
+  --emerald-fg: #166534;
+
+  /* VIEW source — cyan, foreign here. This is what marks data
+     flowing in from VIEW corporate partners. */
+  --view-source:    #0891B2;
+  --view-source-bg: #E0F2FE;
+  --view-source-fg: #0E4F65;
+
+  /* Focus ring — emerald, matching accent */
+  --focus: #16A34A;
+
+  /* Radii — identical to Operator */
+  --radius-sm: 4px;
+  --radius:    6px;
+  --radius-lg: 8px;
+
+  /* H1 — same as Operator */
+  --font-h1:        var(--font-sans);
+  --h1-size:        28px;
+  --h1-weight:      600;
+  --h1-tracking:    -0.02em;
+  --greeting-style: italic;
+  --greeting-font:  var(--font-sans);
 }
 
 /* =========================================================

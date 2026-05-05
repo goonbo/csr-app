@@ -1,24 +1,30 @@
 # Design Changelog
 
 Tracking the redesign from the cream/sage/terracotta prototype to the
-**Operator + Blueprint** blend (revised 2026-05-04).
+**Operator + Blueprint + Field** system (current as of 2026-05-05).
 
 ## Direction
 
-Two rebuilt directions, each anchored on the brand navy + cyan logo:
+Three theme registers, all anchored on the brand navy + cyan logo:
 
-- **Operator** — daily workbench. White surface, navy ink, cyan action,
-  Inter Tight + JetBrains Mono, dense 6–8px radii. Used for app chrome
-  (TopNav) and **all admin and employee pages**.
+- **Operator** — daily workbench. White surface, navy ink, **cyan**
+  action, Inter Tight + JetBrains Mono, dense 6–8px radii. Used for
+  app chrome (TopNav) and all CloudMotion admin and employee pages.
 - **Blueprint** — narrative pages. Mist-white `#F5F7FA`, Fraunces serif
-  hero, generous spacing. Used inside Operator chrome on `/reports` and
-  `/events/[id]/recap` — the editorial moments.
+  hero, generous spacing. Used inside chrome on `/reports`,
+  `/events/[id]/recap`, and `/np/recap/[eventId]` — the editorial
+  moments, on either side of a partnership.
+- **Field** — nonprofit workspace. White surface (same as Operator),
+  navy ink (same as Operator), but **emerald** accent. Inter Tight,
+  same fonts and radii as Operator. The accent flip is the only
+  signal that the workspace has changed; everything else stays so
+  the chrome reads as the same product, not two.
 
-The original plan included a third theme (Pulse — deep navy, dot field,
-Bricolage display) for the employee side. Pivoted 2026-05-04 in favor of
-admin/employee parity, then removed entirely from the live code. The
-blend preview at `public/_preview/blend.html` is the only place it
-still exists, as historical reference.
+The original plan included a fourth theme (Pulse — deep navy, dot
+field, Bricolage display) for the employee side. Pivoted 2026-05-04
+in favor of admin/employee parity, then removed entirely from the
+live code. The blend preview at `public/_preview/blend.html` is the
+only place it still exists, as historical reference.
 
 ## Token system
 
@@ -28,17 +34,29 @@ names to the new vars. This way existing `style={{ background: C.sage }}`
 call sites continue to work — they just resolve to the active theme's
 hex value.
 
-| Theme       | Selector                  | Surface bg | Ink     | Accent  |
-|-------------|---------------------------|------------|---------|---------|
-| Operator    | `:root` (default)         | `#FFFFFF`  | `#0A1A2E` | `#0891B2` |
-| Blueprint   | `[data-theme="blueprint"]` | `#F5F7FA`  | `#0A1A2E` | `#0891B2` |
+| Theme       | Selector                  | Surface bg | Ink     | Accent    |
+|-------------|---------------------------|------------|---------|-----------|
+| Operator    | `:root` (default)         | `#FFFFFF`  | `#0A1A2E` | `#0891B2` (cyan)   |
+| Blueprint   | `[data-theme="blueprint"]` | `#F5F7FA`  | `#0A1A2E` | `#0891B2` (cyan)   |
+| Field       | `[data-theme="field"]`    | `#FFFFFF`  | `#0A1A2E` | `#16A34A` (emerald) |
 
-Both `(admin)` and `(employee)` route groups set
-`data-theme="operator"`. Narrative pages inside admin (recap / reports)
-wrap their content in `[data-theme="blueprint"]`.
+Route group → theme:
+* `(admin)` → `data-theme="operator"`
+* `(employee)` → `data-theme="operator"`
+* `(nonprofit)` → `data-theme="field"`
 
-(Pulse — `[data-theme="pulse"]` — is still defined in `globals.css` but
-no longer wired up. Kept as dead-but-revivable CSS for now.)
+Narrative pages wrap their content in `[data-theme="blueprint"]` —
+the corporate-side `/reports` and `/events/[id]/recap`, plus the
+nonprofit-side `/np/recap/[eventId]`. Both sides share the same
+editorial register.
+
+A fourth set of tokens — `--view-source`, `--view-source-bg`,
+`--view-source-fg` — is defined in both Operator and Field. The
+value is cyan in both. In Field, cyan reads as foreign (emerald is
+local) and is the load-bearing visual for the ViewSourcePill
+primitive that marks data flowing in from VIEW corporate partners.
+In Operator the same value is exposed for cross-context primitives
+that travel between workspaces.
 
 ## Fonts
 
@@ -52,6 +70,30 @@ variables for theme-level selection.
 | `--font-mono`   | JetBrains Mono        | Operator tabular nums, IDs, timestamps |
 
 ## Migration history
+
+### 2026-05-05 — Nonprofit workspace
+- **Field theme** added to globals.css: emerald `#16A34A` accent,
+  otherwise identical to Operator. Plus `--view-source*` tokens
+  in both Operator and Field for the ViewSourcePill primitive.
+- **Workspace concept** in `src/lib/types.ts` — three-way
+  `Workspace` discriminator replaces the old admin/employee role
+  toggle as the outer organizing concept. TopNav restructured
+  around a `WORKSPACES` map.
+- **`(nonprofit)` route group** with five screens: workbench
+  home (`/np`), volunteers list + detail (`/np/volunteers[/id]`),
+  corporate partners list + detail (`/np/partners[/id]`),
+  donations cash + in-kind tabs (`/np/donations`), nonprofit-side
+  event recap in Blueprint register (`/np/recap/[eventId]`).
+- **ViewSourcePill primitive** (`src/components/primitives/`) —
+  cyan-tinted pill with sparkle icon and "via VIEW · {partner}"
+  label, used everywhere the nonprofit workspace mixes
+  VIEW-sourced and direct/imported data.
+- **Seed**: `np-corporate-partners.ts` (8 partners, 4 VIEW),
+  `np-volunteers.ts` (40 volunteers, 16 via VIEW; the 8 named
+  CloudMotion folks are the same humans on the corporate-side
+  employee roster), `np-donations.ts` (~30 cash + 20 in-kind),
+  `np-recap.ts` (1 nonprofit-side recap of e3, matched 1:1 with
+  the corporate-side completed event).
 
 ### 2026-05-04 — Pivot: drop Pulse, employee matches admin
 - `(employee)/layout.tsx` now uses `data-theme="operator"` and drops
