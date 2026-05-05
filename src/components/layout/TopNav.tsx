@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Heart, Calendar, BarChart3 } from 'lucide-react';
+import {
+  Home, Heart, Calendar, BarChart3,
+  Users, Building2, HeartHandshake,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { C } from '@/lib/tokens';
-
-type Role = 'admin' | 'employee';
+import type { Workspace } from '@/lib/types';
 
 interface NavItem {
   href: string;
@@ -28,24 +30,75 @@ const NAV_EMP: NavItem[] = [
   { href: '/me/profile',        label: 'My Impact',     icon: BarChart3, matchPrefix: '/me/profile' },
 ];
 
-const roleFromPath = (pathname: string): Role =>
-  pathname === '/me' || pathname.startsWith('/me/') ? 'employee' : 'admin';
+const NAV_NP: NavItem[] = [
+  { href: '/np',            label: 'Home',       icon: Home },
+  { href: '/np/volunteers', label: 'Volunteers', icon: Users,         matchPrefix: '/np/volunteers' },
+  { href: '/np/partners',   label: 'Partners',   icon: Building2,     matchPrefix: '/np/partners' },
+  { href: '/np/donations',  label: 'Donations',  icon: HeartHandshake, matchPrefix: '/np/donations' },
+];
+
+const workspaceFromPath = (pathname: string): Workspace => {
+  if (pathname === '/np' || pathname.startsWith('/np/')) return 'food-bank-np';
+  if (pathname === '/me' || pathname.startsWith('/me/')) return 'cloudmotion-employee';
+  return 'cloudmotion-admin';
+};
 
 const isItemActive = (item: NavItem, pathname: string): boolean => {
   if (item.matchPrefix) return pathname === item.matchPrefix || pathname.startsWith(item.matchPrefix + '/');
   return pathname === item.href;
 };
 
+interface WorkspaceMeta {
+  label: string;
+  shortLabel: string;
+  pillLabel: string;
+  homeHref: string;
+  navItems: NavItem[];
+  avatar: { initials: string; ariaLabel: string };
+}
+
+const WORKSPACES: Record<Workspace, WorkspaceMeta> = {
+  'cloudmotion-admin': {
+    label: 'CloudMotion · Admin',
+    shortLabel: 'Admin',
+    pillLabel: 'CloudMotion · Admin',
+    homeHref: '/',
+    navItems: NAV_ADMIN,
+    avatar: { initials: 'SC', ariaLabel: 'Sarah Chen' },
+  },
+  'cloudmotion-employee': {
+    label: 'CloudMotion · Employee',
+    shortLabel: 'Employee',
+    pillLabel: 'My View',
+    homeHref: '/me',
+    navItems: NAV_EMP,
+    avatar: { initials: 'SC', ariaLabel: 'Sarah Chen' },
+  },
+  'food-bank-np': {
+    label: 'Greater Austin Food Bank',
+    shortLabel: 'Nonprofit',
+    pillLabel: 'Greater Austin Food Bank',
+    homeHref: '/np',
+    navItems: NAV_NP,
+    avatar: { initials: 'MV', ariaLabel: 'Maria Velasquez' },
+  },
+};
+
+const SWITCHER_ORDER: Workspace[] = [
+  'cloudmotion-admin',
+  'cloudmotion-employee',
+  'food-bank-np',
+];
+
 export function TopNav() {
   const router = useRouter();
   const pathname = usePathname() || '/';
-  const role = roleFromPath(pathname);
-  const items = role === 'admin' ? NAV_ADMIN : NAV_EMP;
-  const workspaceLabel = role === 'admin' ? 'CloudMotion · Admin' : 'My View';
+  const workspace = workspaceFromPath(pathname);
+  const meta = WORKSPACES[workspace];
 
-  const switchRole = (r: Role) => {
-    if (r === role) return;
-    router.push(r === 'admin' ? '/' : '/me');
+  const switchWorkspace = (next: Workspace) => {
+    if (next === workspace) return;
+    router.push(WORKSPACES[next].homeHref);
   };
 
   return (
@@ -67,7 +120,7 @@ export function TopNav() {
         {/* Logo + workspace pill */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Link
-            href={role === 'admin' ? '/' : '/me'}
+            href={meta.homeHref}
             className="view-btn"
             style={{
               display: 'flex',
@@ -96,7 +149,7 @@ export function TopNav() {
             </span>
           </Link>
 
-          {/* Workspace pill */}
+          {/* Workspace pill — full org name, neutral surface, no toggle */}
           <span
             className="hidden md:inline-flex"
             style={{
@@ -111,7 +164,7 @@ export function TopNav() {
               whiteSpace: 'nowrap',
             }}
           >
-            {workspaceLabel}
+            {meta.pillLabel}
           </span>
         </div>
 
@@ -122,7 +175,7 @@ export function TopNav() {
             display: 'flex', alignItems: 'center', gap: 2,
           }}
         >
-          {items.map(item => {
+          {meta.navItems.map(item => {
             const Icon = item.icon;
             const active = isItemActive(item, pathname);
             return (
@@ -153,11 +206,11 @@ export function TopNav() {
           })}
         </nav>
 
-        {/* Role switch + avatar */}
+        {/* Workspace switcher + avatar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div
             role="group"
-            aria-label="Switch role"
+            aria-label="Switch workspace"
             style={{
               display: 'flex', padding: 2,
               borderRadius: 6,
@@ -165,14 +218,15 @@ export function TopNav() {
               border: `1px solid ${C.border}`,
             }}
           >
-            {(['admin', 'employee'] as const).map(r => {
-              const label = r === 'admin' ? 'Admin' : 'Employee';
-              const isCurrent = role === r;
+            {SWITCHER_ORDER.map(w => {
+              const wmeta = WORKSPACES[w];
+              const isCurrent = workspace === w;
               return (
                 <button
-                  key={r}
-                  onClick={() => switchRole(r)}
+                  key={w}
+                  onClick={() => switchWorkspace(w)}
                   aria-pressed={isCurrent}
+                  aria-label={`Switch to ${wmeta.label}`}
                   className="view-btn"
                   style={{
                     padding: '4px 10px',
@@ -186,9 +240,10 @@ export function TopNav() {
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'background 150ms ease, color 150ms ease',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  {label}
+                  {wmeta.shortLabel}
                 </button>
               );
             })}
@@ -201,9 +256,9 @@ export function TopNav() {
               background: `linear-gradient(135deg, ${C.sage}, ${C.sageDeep})`,
               boxShadow: `0 0 0 1px ${C.border}`,
             }}
-            aria-label="Sarah Chen"
+            aria-label={meta.avatar.ariaLabel}
           >
-            SC
+            {meta.avatar.initials}
           </div>
         </div>
       </div>

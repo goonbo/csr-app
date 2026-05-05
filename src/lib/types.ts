@@ -1,3 +1,17 @@
+// Workspaces — the outer concept that organizes which surface a user is in.
+// Inside CloudMotion there's still an admin/employee role distinction
+// (kept in TopNav as a sub-toggle), but the workspace is the outer frame.
+export type Workspace =
+  | 'cloudmotion-admin'
+  | 'cloudmotion-employee'
+  | 'food-bank-np';
+
+// Where a record entered the system. Drives the ViewSourcePill treatment
+// on nonprofit list views. 'view-partner' = came in via a VIEW corporate
+// workspace; 'direct' = created in this nonprofit workspace; 'imported' =
+// migrated from elsewhere (Salesforce, spreadsheets, etc.).
+export type DataSource = 'view-partner' | 'direct' | 'imported';
+
 export type ReadinessTagId =
   | 'strong' | 'solid' | 'closer-look' | 'limited' | 'not-assessed';
 
