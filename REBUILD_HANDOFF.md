@@ -1,6 +1,6 @@
 # shadcn rebuild — session handoff
 
-Picking up the rebuild from a clean context. Started 2026-05-06. Currently **9/18 routes done**.
+Picking up the rebuild from a clean context. Started 2026-05-06. **Phase 4 complete — all 18/18 routes shipped.** Next: Phase 5 (parity audit) and Phase 6 (Figma export readiness).
 
 ## Where things live
 
@@ -32,7 +32,7 @@ Picking up the rebuild from a clean context. Started 2026-05-06. Currently **9/1
 - **Phase 2** (`ec38e33`): 30 shadcn primitives in `src/components/ui/`. `<TooltipProvider>` + `<Toaster />` (sonner) wrap children in root layout.
 - **Phase 3** (`43c0b77`): 7 view/ domain primitives in `src/components/view/`: Pill, PageHeader, AIBlock, LoadingSteps, ReadinessTag, ViewSourcePill, TopNav. `/sandbox` page renders every variant.
 
-### Phase 4 — routes (9 of 18)
+### Phase 4 — routes (18 of 18 ✅)
 
 | # | Route | Theme | Commit |
 |---|---|---|---|
@@ -45,24 +45,22 @@ Picking up the rebuild from a clean context. Started 2026-05-06. Currently **9/1
 | 7 | `/np/recap/[eventId]` | Blueprint inside Field | `eb81c57` |
 | 8 | `/reports` quarterly review | Blueprint | `8ceb36d` |
 | 9 | `/np/partners/[id]` with pending request | Field | `3954b4d` |
+| 10 | `/partners` admin list | Operator | `ef696e8` |
+| 11 | `/events` admin list with stage tabs | Operator | `11a4ba3` |
+| 12 | `/np/volunteers/[id]` profile | Field | `0934980` |
+| 13 | `/np/volunteers` list with source filter | Field | `a6263fc` |
+| 14 | `/np/partners` list with health/source border | Field | `bf5635d` |
+| 15 | `/np/donations` cash + in-kind tabs | Field | `68dc087` |
+| 16 | `/me` employee home (incl. `(employee)/layout.tsx`) | Operator | `bf9329f` |
+| 17 | `/me/opportunities` discover grid | Operator | `10523a1` |
+| 18 | `/me/profile` "Your impact" | Operator | `0466bcd` |
+
+### Foundation fixes shipped during Phase 4
+
+- **`fix(theme): make --view-source-foreground readable on muted bg`** (`2886695`) — repurposed the token from near-white to deep cyan oklch(0.43 0.13 222). Saturated `bg-view-source` icon dots switched to explicit `text-white` (10 sites). Swatches demo split into saturated + muted rows so it tells the truth about how the tokens pair.
+- **`fix(theme): drop auto bg fill on [data-theme] wrappers`** (`db65b85`) — removed the `[data-theme="blueprint"], [data-theme="field"], [data-theme="operator"] { background: var(--background) }` rule that was painting Blueprint pages as a contained mist rectangle inside operator chrome. Route-group layouts already paint `bg-background` on their root, so the auto-fill was redundant. Blueprint identity now carried by typography (Fraunces) and ring-bounded white cards on the parent surface.
 
 ## What's left
-
-### Phase 4 — remaining 9 routes (priority order)
-
-| # | Route | Notes |
-|---|---|---|
-| 10 | `/partners` | admin partners list. Each card: name, cause, geo, ReadinessTag, health pill, "View profile →" link |
-| 11 | `/events` | admin events list. Tabs: All / In flight / Live / Wrapped. Cards have left-border by status |
-| 12 | `/np/volunteers/[id]` | volunteer profile — hours timeline, recognitions, skills (with VIEW source on partner-sourced) |
-| 13 | `/np/volunteers` | volunteers list — search + source filter (all / via VIEW / direct / imported), sortable, ViewSourcePill on partner volunteers |
-| 14 | `/np/partners` | corporate partners list — health pill, source filter, cyan border-left for VIEW partners, amber for at-risk |
-| 15 | `/np/donations` | cash + in-kind tabs (use shadcn `Tabs` primitive). KPI strip + table rows |
-| 16 | `/me` | employee home — events you're in, hours so far, browse-opportunities link |
-| 17 | `/me/opportunities` | opportunities grid with cause-color avatars, RSVP CTAs |
-| 18 | `/me/profile` | "My impact" — hours, events, cause breakdown |
-
-`(employee)/layout.tsx` does not yet exist in the rebuild — create it before the first /me route, mirror `(admin)/layout.tsx` (sets `data-theme="operator"`).
 
 ### Phase 5 — Parity audit
 Side-by-side every rebuilt route vs. the festive worktree (current product). Document drift. Fix unless intentional improvement.
@@ -148,25 +146,26 @@ src/
       layout.tsx                              ✅
       page.tsx                                ✅ #1
       partners/[id]/page.tsx                  ✅ #2
-      partners/page.tsx                       ⏳ #10
+      partners/page.tsx                       ✅ #10
       events/[id]/page.tsx                    ✅ #6
       events/[id]/recap/page.tsx              ✅ #4 Blueprint
       events/new/page.tsx                     ✅ #3
-      events/page.tsx                         ⏳ #11
+      events/page.tsx                         ✅ #11
       reports/page.tsx                        ✅ #8 Blueprint
-    (employee)/                               ⏳ create layout first
-      me/page.tsx                             ⏳ #16
-      me/opportunities/page.tsx               ⏳ #17
-      me/profile/page.tsx                     ⏳ #18
+    (employee)/
+      layout.tsx                              ✅ Operator
+      me/page.tsx                             ✅ #16
+      me/opportunities/page.tsx               ✅ #17
+      me/profile/page.tsx                     ✅ #18
     (nonprofit)/
       layout.tsx                              ✅ Field
       np/page.tsx                             ✅ #5
-      np/donations/page.tsx                   ⏳ #15 (use Tabs primitive)
+      np/donations/page.tsx                   ✅ #15
       np/partners/[id]/page.tsx               ✅ #9
-      np/partners/page.tsx                    ⏳ #14
+      np/partners/page.tsx                    ✅ #14
       np/recap/[eventId]/page.tsx             ✅ #7 Blueprint
-      np/volunteers/[id]/page.tsx             ⏳ #12
-      np/volunteers/page.tsx                  ⏳ #13
+      np/volunteers/[id]/page.tsx             ✅ #12
+      np/volunteers/page.tsx                  ✅ #13
     layout.tsx                                ✅ root: fonts + TooltipProvider + Toaster
     globals.css                               ✅ 3 oklch theme scopes
     sandbox/page.tsx                          ✅ phase 3 demo
@@ -185,11 +184,9 @@ src/
 
 ## Resume checklist for next session
 
-1. `cd .claude/worktrees/shadcn-rebuild && git pull` (no rebase needed; branch is up-to-date locally)
+1. `cd .claude/worktrees/shadcn-rebuild && git pull`
 2. `corepack pnpm install` (in case lockfile changed)
 3. Read this file
-4. Read the `festive-chandrasekhar-8ba42a` worktree's source for the next route (10: `/partners`)
-5. Write rebuild, follow the verification recipe, commit, push
-6. Move to next route
+4. Phase 4 is complete. Move on to **Phase 5 (parity audit)** or **Phase 6 (Figma export readiness)** per the priorities above.
 
-When all 18 are done, do Phase 5 (parity audit) and Phase 6 (Figma export readiness).
+For Phase 5, the recipe is: navigate the same URL on both `:3100` (rebuild) and the festive worktree's dev server, screenshot side-by-side, document drift in a per-route checklist, and fix anything that isn't an intentional improvement.
