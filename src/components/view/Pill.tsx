@@ -26,7 +26,10 @@ const pillVariants = cva(
       tone: {
         neutral:    "bg-muted text-muted-foreground border-border",
         sage:       "bg-emerald-50 text-emerald-900 border-emerald-200",
-        terracotta: "bg-orange-50 text-orange-900 border-orange-200",
+        // The "terracotta" label is historical — in the live system the
+        // tone resolves to cyan (the brand accent). Keeping the name
+        // for stable call sites; the visual is cyan.
+        terracotta: "bg-primary/10 text-primary border-primary/30",
         amber:      "bg-amber-50 text-amber-900 border-amber-200",
         rose:       "bg-rose-50 text-rose-900 border-rose-200",
       },

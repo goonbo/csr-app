@@ -28,7 +28,6 @@ import { Pill } from "@/components/view/Pill";
 import { PageHeader } from "@/components/view/PageHeader";
 import { AIBlock } from "@/components/view/AIBlock";
 import { LoadingSteps } from "@/components/view/LoadingSteps";
-import { cn } from "@/lib/utils";
 
 const RECAP_STEPS = [
   "Pulling attendance and outputs…",
@@ -141,13 +140,11 @@ export default function EventRecapPage({ params }: RecapPageProps) {
             <ValueCard
               eyebrow="What this meant for us"
               body={recap.businessValue}
-              accent="sage"
               onRegen={regenerate}
             />
             <ValueCard
               eyebrow="What this meant for them"
               body={recap.nonprofitValue}
-              accent="terracotta"
               onRegen={regenerate}
             />
           </div>
@@ -205,29 +202,15 @@ export default function EventRecapPage({ params }: RecapPageProps) {
 function ValueCard({
   eyebrow,
   body,
-  accent,
   onRegen,
 }: {
   eyebrow: string;
   body: string;
-  accent: "sage" | "terracotta";
   onRegen: () => void;
 }) {
   return (
-    <Card
-      className={cn(
-        "border-t-4 p-7",
-        accent === "sage" && "border-t-emerald-500",
-        accent === "terracotta" && "border-t-orange-500",
-      )}
-    >
-      <div
-        className={cn(
-          "mb-3 text-[11px] font-bold uppercase tracking-wider",
-          accent === "sage" && "text-emerald-700",
-          accent === "terracotta" && "text-orange-700",
-        )}
-      >
+    <Card className="border-t-4 border-t-primary p-7">
+      <div className="mb-3 text-[11px] font-bold uppercase tracking-wider text-primary">
         {eyebrow}
       </div>
       <AIBlock label="AI draft · editable" onRegenerate={onRegen}>

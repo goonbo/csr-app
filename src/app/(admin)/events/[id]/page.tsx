@@ -266,10 +266,10 @@ function AtRiskDiagnosis({
 function DayOfCommandCenter({ event }: { event: EventType }) {
   const checkedIn = Math.floor(event.registered * 0.62);
   return (
-    <Card className="overflow-hidden border-t-4 border-t-orange-500 p-0">
+    <Card className="overflow-hidden border-t-4 border-t-primary p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-7 py-5">
         <div>
-          <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-orange-600">
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-primary">
             Day-of command center
           </div>
           <h2 className="text-[15px] font-semibold text-foreground">
@@ -545,10 +545,10 @@ function ReconciliationQueue({
     (reconciliation.photoConsent?.length ?? 0);
 
   return (
-    <Card className="overflow-hidden border-t-4 border-t-orange-500 p-0">
+    <Card className="overflow-hidden border-t-4 border-t-primary p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-7 py-5">
         <div>
-          <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-orange-600">
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-primary">
             Review queue
           </div>
           <h2 className="text-[15px] font-semibold text-foreground">

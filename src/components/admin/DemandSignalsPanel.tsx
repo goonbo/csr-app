@@ -119,12 +119,12 @@ export function DemandSignalsPanel() {
         </div>
 
         {/* Bottom: drift signal — the most operator-critical insight */}
-        <div className="flex items-start gap-2.5 border-t border-orange-200 bg-orange-50 px-7 py-3.5">
+        <div className="flex items-start gap-2.5 border-t border-primary/30 bg-primary/10 px-7 py-3.5">
           <Sparkles
             aria-hidden="true"
-            className="mt-0.5 size-3.5 shrink-0 text-orange-700"
+            className="mt-0.5 size-3.5 shrink-0 text-primary"
           />
-          <p className="text-xs leading-relaxed text-orange-900">
+          <p className="text-xs leading-relaxed text-primary">
             <span className="font-semibold">
               Drift signal · {DEMAND_SIGNALS.drift.partner}.
             </span>{" "}
