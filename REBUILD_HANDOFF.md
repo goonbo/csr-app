@@ -1,6 +1,6 @@
 # shadcn rebuild — session handoff
 
-Picking up the rebuild from a clean context. Started 2026-05-06. **Phase 4 complete — all 18/18 routes shipped.** Next: Phase 5 (parity audit) and Phase 6 (Figma export readiness).
+Picking up the rebuild from a clean context. Started 2026-05-06. **Phases 4–5 complete.** Next: Phase 6 (Figma export readiness).
 
 ## Where things live
 
@@ -60,10 +60,51 @@ Picking up the rebuild from a clean context. Started 2026-05-06. **Phase 4 compl
 - **`fix(theme): make --view-source-foreground readable on muted bg`** (`2886695`) — repurposed the token from near-white to deep cyan oklch(0.43 0.13 222). Saturated `bg-view-source` icon dots switched to explicit `text-white` (10 sites). Swatches demo split into saturated + muted rows so it tells the truth about how the tokens pair.
 - **`fix(theme): drop auto bg fill on [data-theme] wrappers`** (`db65b85`) — removed the `[data-theme="blueprint"], [data-theme="field"], [data-theme="operator"] { background: var(--background) }` rule that was painting Blueprint pages as a contained mist rectangle inside operator chrome. Route-group layouts already paint `bg-background` on their root, so the auto-fill was redundant. Blueprint identity now carried by typography (Fraunces) and ring-bounded white cards on the parent surface.
 
-## What's left
+### Phase 5 — Parity audit (complete ✅)
 
-### Phase 5 — Parity audit
-Side-by-side every rebuilt route vs. the festive worktree (current product). Document drift. Fix unless intentional improvement.
+Side-by-side audit of all 18 routes against the festive reference
+worktree. The dominant drift was that the festive worktree aliases
+`C.sage` / `C.terracotta` / `C.sageDeep` / `C.terracottaDeep` (and
+their `*Glow` variants) to `var(--accent)` and friends — which in
+operator/blueprint scope is cyan and in field is emerald. The
+rebuild had been using literal Tailwind emerald palette classes
+everywhere, which read as drift on operator/blueprint surfaces.
+
+Fixed (commits in chronological order):
+* `7a85e03` — `/partners/[id]` Fit-panel cyan border-top + Blueprint
+  H1 tokens (`--page-heading-size/-weight/-tracking` per scope, set
+  to 56px / 350 in Blueprint, 30px / 600 elsewhere). PageHeader's
+  H1 now consumes the vars via inline style.
+* `f9bb890` — `Pill` `tone="terracotta"` switched to primary tinted;
+  ditto for `(admin)/events/[id]` Day-of-Command Center + Review
+  Queue borders/eyebrows; `(admin)/events/[id]/recap` ValueCard
+  collapsed to single primary tone (both "us" + "them" use
+  `border-t-primary text-primary`); `DemandSignalsPanel` drift
+  signal ribbon switched from orange to primary tinted.
+* `8f6bf5c` — VTORing emerald stroke → primary; `/me` "+Nh above"
+  emerald → primary; `/me/opportunities` SignUpButton emerald →
+  primary, capacity bar emerald → primary, Match pill emerald →
+  primary; `/me/profile` italic clause + 88px gradient avatar +
+  active cause pill + Heart logged pill all emerald → primary;
+  `/np/volunteers` "Imported" + "Inactive" chips dropped uppercase.
+* `4ebceff` — `Pill tone="sage"` + `ReadinessTag tone="sage"` both
+  switched to `bg-primary/10 text-primary border-primary/30`; KPI
+  positive trends + AtRiskOptions sage dot + StageNote confirmed
+  border + supply-check icons + "On site" labels + reconciliation
+  buttons + numbered dots in NextItem (recap) and reports — all
+  emerald → primary.
+
+Held back as intentional improvements (not parity drift):
+* DemandSignalsPanel trend color split — `up` = emerald-600 stays;
+  `emerging` = orange-600 stays. Reference collapses both to cyan,
+  but the original code intent was differentiation. Color +
+  trend-icon together communicate the signal more clearly than the
+  collapsed cyan.
+* Blueprint surface — auto bg-fill on `[data-theme]` wrappers
+  removed in Phase 4 (`db65b85`); Blueprint pages now sit on the
+  parent operator/field surface with white cards instead of the
+  legacy contained mist rectangle. Editorial register is still
+  carried by typography (Fraunces) and ring-bounded cards.
 
 ### Phase 6 — Figma export readiness
 - Verify `components.json` setup is correct
@@ -187,6 +228,12 @@ src/
 1. `cd .claude/worktrees/shadcn-rebuild && git pull`
 2. `corepack pnpm install` (in case lockfile changed)
 3. Read this file
-4. Phase 4 is complete. Move on to **Phase 5 (parity audit)** or **Phase 6 (Figma export readiness)** per the priorities above.
+4. Phases 4–5 are complete. **Move on to Phase 6 (Figma export readiness).**
 
-For Phase 5, the recipe is: navigate the same URL on both `:3100` (rebuild) and the festive worktree's dev server, screenshot side-by-side, document drift in a per-route checklist, and fix anything that isn't an intentional improvement.
+For Phase 5 the recipe was: start both dev servers (`next-dev` for
+festive on :3000, `next-dev-shadcn` for rebuild on :3100), navigate
+each URL on both, screenshot, and `getComputedStyle()` any element
+whose color looked off. The dominant drift turned out to be one
+class of issue — emerald-as-cyan literal classes — which is now
+captured in the domain primitives (`Pill` / `ReadinessTag`) so
+future routes inherit the right behavior automatically.
