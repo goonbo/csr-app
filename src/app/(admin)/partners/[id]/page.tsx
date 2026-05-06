@@ -192,7 +192,7 @@ function MutualFitPanel({ minGroup, maxGroup }: { minGroup: number; maxGroup: nu
   ];
 
   return (
-    <Card className="border-t-4 border-t-orange-400 p-7">
+    <Card className="border-t-4 border-t-primary p-7">
       <header className="mb-1.5 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-foreground">
           Fit for your team

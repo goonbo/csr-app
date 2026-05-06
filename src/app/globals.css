@@ -106,8 +106,14 @@ html, body { margin: 0; padding: 0; }
   --chart-5: oklch(0.704 0.18 12);       /* rose-500 */
 
   /* Heading family — Operator uses sans (Inter Tight). Blueprint
-     overrides to serif (Fraunces) below for the editorial register. */
+     overrides to serif (Fraunces) below for the editorial register.
+     `--page-heading-size` and `-weight` track per-scope hero sizing
+     so PageHeader scales up to Fraunces 56px in Blueprint without
+     a wrapper-level conditional. */
   --heading-family: var(--font-sans);
+  --page-heading-size:   1.875rem;      /* 30px — Operator/Field */
+  --page-heading-weight: 600;
+  --page-heading-tracking: -0.025em;
 
   --radius: 0.375rem;                    /* 6px — dense */
 }
@@ -145,8 +151,12 @@ html, body { margin: 0; padding: 0; }
   --view-source-foreground: oklch(0.43 0.13 222);
   --view-source-muted:      oklch(0.967 0.025 220);
 
-  /* Editorial register — H1 reads as Fraunces serif here */
+  /* Editorial register — H1 reads as Fraunces serif here, larger
+     and lighter for the magazine-cover register */
   --heading-family: var(--font-serif);
+  --page-heading-size:   3.5rem;        /* 56px */
+  --page-heading-weight: 350;
+  --page-heading-tracking: -0.025em;
 
   --radius: 0.625rem;                   /* 10px — generous */
 }

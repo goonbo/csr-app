@@ -68,10 +68,12 @@ export function PageHeader({
           ) : null}
           <h1
             data-slot="page-header-title"
-            className={cn(
-              "font-heading text-3xl font-semibold tracking-tight",
-              "text-foreground leading-tight",
-            )}
+            className={cn("font-heading text-foreground leading-tight")}
+            style={{
+              fontSize: "var(--page-heading-size)",
+              fontWeight: "var(--page-heading-weight)" as React.CSSProperties["fontWeight"],
+              letterSpacing: "var(--page-heading-tracking)",
+            }}
           >
             {title}
           </h1>
