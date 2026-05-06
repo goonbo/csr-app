@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter_Tight, Fraunces, JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const sans = Inter_Tight({
@@ -36,7 +38,10 @@ export default function RootLayout({
       lang="en"
       className={cn(sans.variable, serif.variable, mono.variable)}
     >
-      <body>{children}</body>
+      <body>
+        <TooltipProvider>{children}</TooltipProvider>
+        <Toaster />
+      </body>
     </html>
   );
 }
