@@ -24,7 +24,9 @@ const readinessVariants = cva(
   {
     variants: {
       tone: {
-        sage:    "bg-emerald-50 text-emerald-900 border-emerald-200",
+        // `sage` aliases to the brand accent — cyan in operator/blueprint,
+        // emerald in field — via `--primary`.
+        sage:    "bg-primary/10 text-primary border-primary/30",
         amber:   "bg-amber-50 text-amber-900 border-amber-200",
         neutral: "bg-muted text-muted-foreground border-border",
       },

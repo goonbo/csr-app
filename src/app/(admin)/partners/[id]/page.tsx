@@ -213,7 +213,7 @@ function MutualFitPanel({ minGroup, maxGroup }: { minGroup: number; maxGroup: nu
             className={cn(
               "rounded-xl border p-4",
               f.tone === "sage"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                ? "border-primary/30 bg-primary/10 text-primary"
                 : "border-amber-200 bg-amber-50 text-amber-900",
             )}
           >
@@ -346,7 +346,7 @@ function DiligenceOverview({ diligence }: { diligence: Diligence }) {
                         className={cn(
                           "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold",
                           alt.fit === "Possible" &&
-                            "border-emerald-200 bg-emerald-50 text-emerald-900",
+                            "border-primary/30 bg-primary/10 text-primary",
                           alt.fit === "Worth considering" &&
                             "border-amber-200 bg-amber-50 text-amber-900",
                           alt.fit !== "Possible" &&

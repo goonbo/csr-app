@@ -25,10 +25,11 @@ const pillVariants = cva(
     variants: {
       tone: {
         neutral:    "bg-muted text-muted-foreground border-border",
-        sage:       "bg-emerald-50 text-emerald-900 border-emerald-200",
-        // The "terracotta" label is historical — in the live system the
-        // tone resolves to cyan (the brand accent). Keeping the name
-        // for stable call sites; the visual is cyan.
+        // `sage` and `terracotta` are historical names. In the live
+        // system both alias to the brand accent (cyan in operator/
+        // blueprint, emerald in field via `--primary`). Keeping the
+        // names stable for call sites; the visual flips per scope.
+        sage:       "bg-primary/10 text-primary border-primary/30",
         terracotta: "bg-primary/10 text-primary border-primary/30",
         amber:      "bg-amber-50 text-amber-900 border-amber-200",
         rose:       "bg-rose-50 text-rose-900 border-rose-200",

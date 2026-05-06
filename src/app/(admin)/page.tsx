@@ -289,7 +289,7 @@ export default function AdminHomePage() {
                     <div
                       className={cn(
                         "mt-0.5 text-[11px]",
-                        k.positive ? "text-emerald-600" : "text-muted-foreground",
+                        k.positive ? "text-primary" : "text-muted-foreground",
                       )}
                     >
                       {k.sub}
@@ -572,7 +572,7 @@ const TONE_CELL_CLASSES: Record<
   { bg: string; accent: string; text: string }
 > = {
   neutral:    { bg: "bg-muted",       accent: "bg-border-strong", text: "text-muted-foreground" },
-  sage:       { bg: "bg-emerald-50",  accent: "bg-emerald-500",   text: "text-emerald-900" },
+  sage:       { bg: "bg-primary/10",  accent: "bg-primary",       text: "text-primary" },
   amber:      { bg: "bg-amber-50",    accent: "bg-amber-500",     text: "text-amber-900" },
   rose:       { bg: "bg-rose-50",     accent: "bg-rose-500",      text: "text-rose-900" },
   terracotta: { bg: "bg-orange-50",   accent: "bg-orange-500",    text: "text-orange-900" },

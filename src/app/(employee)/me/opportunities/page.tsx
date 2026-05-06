@@ -411,7 +411,7 @@ function OpportunityRow({
                   "h-full",
                   event.pipeline === "at-risk"
                     ? "bg-rose-500"
-                    : "bg-emerald-500",
+                    : "bg-primary",
                 )}
                 style={{ width: `${Math.min(100, fillPct)}%` }}
               />

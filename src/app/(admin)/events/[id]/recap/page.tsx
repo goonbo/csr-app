@@ -244,7 +244,7 @@ function NextItem({ item, index }: { item: AIRecapNext; index: number }) {
     <div className="flex gap-3.5 rounded-xl border border-border bg-card p-4">
       <div
         aria-hidden="true"
-        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 font-heading text-xs font-bold text-emerald-800"
+        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-xs font-bold text-primary"
       >
         {index}
       </div>

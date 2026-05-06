@@ -216,7 +216,7 @@ function AtRiskDiagnosis({
           <div className="flex flex-col gap-2.5">
             {options.map((opt, i) => {
               const tones = {
-                sage:  { dot: "bg-emerald-500", label: "Cheapest move" },
+                sage:  { dot: "bg-primary",     label: "Cheapest move" },
                 amber: { dot: "bg-amber-500",   label: "Worth weighing" },
                 rose:  { dot: "bg-rose-500",    label: "Last resort" },
               } as const;
@@ -295,7 +295,7 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
             <div
               className={cn(
                 "mb-1 font-heading text-3xl leading-none",
-                m.tone === "sage" && "text-emerald-700",
+                m.tone === "sage" && "text-primary",
                 m.tone === "amber" && "text-amber-800",
                 m.tone === "ink" && "text-foreground",
               )}
@@ -312,7 +312,7 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
         <div className="border-b border-border px-6 py-5 md:border-b-0 md:border-r md:pl-7">
           <div className="mb-3 flex items-center gap-1.5">
             <CheckCircle2
-              className="size-3.5 text-emerald-600"
+              className="size-3.5 text-primary"
               aria-hidden="true"
             />
             <span className="text-xs font-semibold text-foreground">
@@ -344,11 +344,11 @@ function DayOfCommandCenter({ event }: { event: EventType }) {
           <div className="flex flex-col gap-1.5 text-[11px] text-muted-foreground">
             <div className="flex justify-between">
               <span>Boxes</span>
-              <span className="font-semibold text-emerald-700">✓ On site</span>
+              <span className="font-semibold text-primary">✓ On site</span>
             </div>
             <div className="flex justify-between">
               <span>Aprons</span>
-              <span className="font-semibold text-emerald-700">✓ On site</span>
+              <span className="font-semibold text-primary">✓ On site</span>
             </div>
             <div className="flex justify-between">
               <span>Backup task plan</span>
@@ -427,8 +427,8 @@ function StageNote({ event }: { event: EventType }) {
         return {
           eyebrow: "Comms plan",
           note: event.confirmedNote,
-          border: "border-t-emerald-700",
-          eyebrowText: "text-emerald-800",
+          border: "border-t-primary",
+          eyebrowText: "text-primary",
         };
       default:
         return null;
@@ -490,7 +490,7 @@ function AttendeesList({
             <div className="flex min-w-0 items-center gap-3">
               <div
                 aria-hidden="true"
-                className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-300 text-[11px] font-semibold text-white"
+                className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-[11px] font-semibold text-white"
               >
                 {a.name
                   .split(" ")
@@ -593,7 +593,7 @@ function ReconciliationQueue({
                 <div className="flex gap-1.5">
                   <button
                     type="button"
-                    className="rounded-full border border-emerald-500 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-900 hover:bg-emerald-100"
+                    className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary/15"
                   >
                     Mark attended
                   </button>
@@ -637,7 +637,7 @@ function ReconciliationQueue({
                     <div className="flex gap-1.5">
                       <button
                         type="button"
-                        className="rounded-full border border-emerald-500 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-900 hover:bg-emerald-100"
+                        className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-primary/15"
                       >
                         Approve
                       </button>

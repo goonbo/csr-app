@@ -244,7 +244,7 @@ function EventCard({
       )}
 
       {e.pipeline === "confirmed" && e.confirmedNote && (
-        <div className="border-l-2 border-emerald-500 pl-3 text-xs leading-relaxed text-foreground/70">
+        <div className="border-l-2 border-primary pl-3 text-xs leading-relaxed text-foreground/70">
           {e.confirmedNote}
         </div>
       )}
