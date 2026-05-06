@@ -92,7 +92,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               <div className="mb-4 flex items-center gap-2">
                 <div
                   aria-hidden="true"
-                  className="flex size-7 items-center justify-center rounded-full bg-view-source text-view-source-foreground"
+                  className="flex size-7 items-center justify-center rounded-full bg-view-source text-white"
                 >
                   <Sparkles className="size-3" />
                 </div>
@@ -250,7 +250,7 @@ function DiligenceOverview({ diligence }: { diligence: Diligence }) {
         <div className="flex items-center gap-2">
           <div
             aria-hidden="true"
-            className="flex size-6 items-center justify-center rounded-full bg-view-source text-view-source-foreground"
+            className="flex size-6 items-center justify-center rounded-full bg-view-source text-white"
           >
             <Sparkles className="size-2.5" />
           </div>

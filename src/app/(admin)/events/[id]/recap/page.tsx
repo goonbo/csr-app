@@ -90,7 +90,7 @@ export default function EventRecapPage({ params }: RecapPageProps) {
             <div className="mb-4 flex items-center gap-2">
               <div
                 aria-hidden="true"
-                className="flex size-7 items-center justify-center rounded-full bg-view-source text-view-source-foreground"
+                className="flex size-7 items-center justify-center rounded-full bg-view-source text-white"
               >
                 <Sparkles className="size-3" />
               </div>
@@ -111,7 +111,7 @@ export default function EventRecapPage({ params }: RecapPageProps) {
               <div className="flex min-w-0 items-center gap-3">
                 <div
                   aria-hidden="true"
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-view-source-foreground"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-white"
                 >
                   <Sparkles className="size-3" />
                 </div>

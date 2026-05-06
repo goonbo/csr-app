@@ -44,7 +44,7 @@ export function LoadingSteps({ steps, idx, className }: LoadingStepsProps) {
             {done ? (
               <span
                 aria-hidden="true"
-                className="flex size-4 items-center justify-center rounded-full bg-view-source text-view-source-foreground"
+                className="flex size-4 items-center justify-center rounded-full bg-view-source text-white"
               >
                 <Check className="size-2.5" strokeWidth={3} />
               </span>

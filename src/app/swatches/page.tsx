@@ -12,7 +12,8 @@ const TOKENS: { name: string; bg: string; fg: string }[] = [
   { name: "muted",         bg: "bg-muted",         fg: "text-muted-foreground" },
   { name: "accent",        bg: "bg-accent",        fg: "text-accent-foreground" },
   { name: "destructive",   bg: "bg-destructive",   fg: "text-destructive-foreground" },
-  { name: "view-source",   bg: "bg-view-source",   fg: "text-view-source-foreground" },
+  { name: "view-source",       bg: "bg-view-source",       fg: "text-white" },
+  { name: "view-source-muted", bg: "bg-view-source-muted", fg: "text-view-source-foreground" },
   { name: "border",        bg: "bg-border",        fg: "text-foreground" },
   { name: "ring",          bg: "bg-ring",          fg: "text-primary-foreground" },
 ];

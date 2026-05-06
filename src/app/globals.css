@@ -89,9 +89,12 @@ html, body { margin: 0; padding: 0; }
 
   /* VIEW source — cyan in any theme. In Field this reads as foreign;
      in Operator it's the same hue as --primary (consumers add a
-     sparkle icon + label so the meaning is still legible). */
+     sparkle icon + label so the meaning is still legible).
+     Foreground is deep cyan, sized for readable text on the muted
+     tint and on transparent surfaces. Saturated `bg-view-source`
+     pairs with explicit `text-white` at the consumer site. */
   --view-source:            oklch(0.609 0.126 221.723);
-  --view-source-foreground: oklch(0.984 0.003 247.858);
+  --view-source-foreground: oklch(0.43 0.13 222);     /* cyan-700-ish */
   --view-source-muted:      oklch(0.967 0.025 220);    /* cyan-50 tint */
 
   /* Charts — keep neutrally diverse so cause-color avatars don't
@@ -139,7 +142,7 @@ html, body { margin: 0; padding: 0; }
   --ring:               oklch(0.609 0.126 221.723);
 
   --view-source:            oklch(0.609 0.126 221.723);
-  --view-source-foreground: oklch(0.984 0.003 247.858);
+  --view-source-foreground: oklch(0.43 0.13 222);
   --view-source-muted:      oklch(0.967 0.025 220);
 
   /* Editorial register — H1 reads as Fraunces serif here */
@@ -180,7 +183,7 @@ html, body { margin: 0; padding: 0; }
 
   /* VIEW source stays cyan — the load-bearing "foreign here" mark. */
   --view-source:            oklch(0.609 0.126 221.723);
-  --view-source-foreground: oklch(0.984 0.003 247.858);
+  --view-source-foreground: oklch(0.43 0.13 222);
   --view-source-muted:      oklch(0.967 0.025 220);
 
   --chart-1: oklch(0.609 0.126 221.723);

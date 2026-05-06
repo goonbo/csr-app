@@ -307,7 +307,7 @@ export default function AdminHomePage() {
             <div className="flex items-start gap-2.5">
               <div
                 aria-hidden="true"
-                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-view-source-foreground"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-white"
               >
                 <Sparkles className="size-3" />
               </div>
@@ -372,7 +372,7 @@ function AttentionCard({
             "flex size-8 shrink-0 items-center justify-center rounded-full",
             tone === "rose" && "bg-rose-50 text-rose-700",
             tone === "amber" && "bg-amber-50 text-amber-700",
-            tone === "ai" && "bg-view-source text-view-source-foreground",
+            tone === "ai" && "bg-view-source text-white",
           )}
         >
           <Icon className="size-3.5" strokeWidth={2.4} />
