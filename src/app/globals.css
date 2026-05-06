@@ -213,12 +213,16 @@ html, body { margin: 0; padding: 0; }
   html { @apply font-sans; }
 }
 
-/* Theme wrappers paint their own background so a Blueprint section
-   inside an Operator chrome shows the right surface. */
+/* Theme wrappers carry only the CSS-var scope by default. The
+   route-group layouts already paint `bg-background` on their root,
+   so we don't double-apply here. Pages that wrap a Blueprint
+   section inside an Operator/Field shell inherit the parent
+   surface (white) — cards stay `bg-card`, and the editorial
+   register is carried by typography (Fraunces) and radii, not by
+   a contained mist rectangle. */
 [data-theme="blueprint"],
 [data-theme="field"],
 [data-theme="operator"] {
-  background: var(--background);
   color: var(--foreground);
 }
 
