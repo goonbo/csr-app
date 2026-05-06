@@ -108,14 +108,14 @@ export default function EmployeeProfilePage() {
                   Across {attended.length} events and {causeBreakdown.length}{" "}
                   cause{causeBreakdown.length === 1 ? "" : "s"} — equivalent
                   to{" "}
-                  <span className="italic text-emerald-700">
+                  <span className="italic text-primary">
                     a half-week of work given back to your community.
                   </span>
                 </div>
               </div>
               <div
                 aria-hidden="true"
-                className="flex size-[88px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-300 font-heading text-[28px] font-semibold text-white"
+                className="flex size-[88px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 font-heading text-[28px] font-semibold text-white"
               >
                 {initials}
               </div>
@@ -211,7 +211,7 @@ export default function EmployeeProfilePage() {
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                       active
-                        ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                        ? "border-primary/30 bg-primary/10 text-primary"
                         : "border-border text-muted-foreground hover:bg-muted",
                     )}
                   >
@@ -311,7 +311,7 @@ function TimelineRow({
             </>
           )}
         </div>
-        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800">
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
           <Heart className="size-2.5" strokeWidth={2.4} aria-hidden="true" />
           {PER_EVENT_HOURS}h logged
         </div>

@@ -218,7 +218,7 @@ function VolunteerRow({ volunteer: v, isLast, onClick }: VolunteerRowProps) {
               <ViewSourcePill partner={v.employer} size="sm" />
             )}
             {v.source === "imported" && (
-              <span className="inline-flex items-center rounded-full border border-border bg-muted px-1.5 py-px text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="inline-flex items-center rounded-full border border-border bg-muted px-1.5 py-px text-[10px] font-semibold tracking-wide text-muted-foreground">
                 Imported
               </span>
             )}
@@ -229,7 +229,7 @@ function VolunteerRow({ volunteer: v, isLast, onClick }: VolunteerRowProps) {
               </span>
             )}
             {v.status === "inactive" && (
-              <span className="inline-flex items-center rounded-full border border-border px-1.5 py-px text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="inline-flex items-center rounded-full border border-border px-1.5 py-px text-[10px] font-semibold tracking-wide text-muted-foreground">
                 Inactive
               </span>
             )}

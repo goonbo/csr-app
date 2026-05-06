@@ -272,7 +272,7 @@ function FeaturedRow({
               <div
                 className={cn(
                   "h-full",
-                  event.pipeline === "at-risk" ? "bg-rose-500" : "bg-emerald-500",
+                  event.pipeline === "at-risk" ? "bg-rose-500" : "bg-primary",
                 )}
                 style={{ width: `${Math.min(100, fillPct)}%` }}
               />
@@ -358,7 +358,7 @@ function OpportunityRow({
             {event.cause}
           </span>
           {isMatch && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-px text-[10px] font-bold uppercase tracking-wider text-emerald-900">
+            <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-px text-[10px] font-bold uppercase tracking-wider text-primary">
               <Sparkles
                 className="size-2.5"
                 strokeWidth={2.6}
@@ -461,8 +461,8 @@ function SignUpButton({
         "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         size === "lg" ? "px-5 py-2.5 text-sm" : "px-4 py-2 text-[13px]",
         isSignedUp
-          ? "border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
-          : "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700",
+          ? "border border-primary/30 bg-primary/10 text-primary hover:bg-primary/15"
+          : "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
       )}
     >
       {isSignedUp ? (

@@ -275,7 +275,7 @@ function VTORing({ used, pool }: { used: number; pool: number }) {
           cy={70}
           r={r}
           fill="none"
-          className="stroke-emerald-500"
+          className="stroke-primary"
           strokeWidth={10}
           strokeDasharray={circ}
           strokeDashoffset={offset}
@@ -309,7 +309,7 @@ function VTORing({ used, pool }: { used: number; pool: number }) {
             <>
               {" "}
               That&rsquo;s{" "}
-              <span className="font-semibold text-emerald-700">
+              <span className="font-semibold text-primary">
                 +{overage}h above
               </span>{" "}
               the company average.
