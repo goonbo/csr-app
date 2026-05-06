@@ -1,7 +1,8 @@
 # Design Changelog
 
 Tracking the redesign from the cream/sage/terracotta prototype to the
-**Operator + Blueprint + Field** system (current as of 2026-05-05).
+**Operator + Blueprint + Field** system, now being rebuilt on
+**shadcn/ui** for Figma export readiness (in progress as of 2026-05-06).
 
 ## Direction
 
@@ -70,6 +71,52 @@ variables for theme-level selection.
 | `--font-mono`   | JetBrains Mono        | Operator tabular nums, IDs, timestamps |
 
 ## Migration history
+
+### 2026-05-06 — shadcn/ui rebuild · Phase 1 foundation
+
+Begins a rebuild of the prototype on a shadcn/ui foundation, motivated
+by Figma-kit interop: when component naming, variant names, and CSS
+variable names match shadcn's conventions, designers can pick the
+project up in Figma via the official kit + connector tooling without a
+translation layer. The aesthetic (Operator + Blueprint + Field) is
+preserved; the implementation foundation changes.
+
+Phase 1 (this commit):
+- New branch `claude/shadcn-rebuild` off `main`. The legacy app shell
+  (every `src/app/(*)` route, every `src/components/{admin,layout,
+  primitives}/*`, the legacy `C` proxy in `src/lib/tokens.ts`) is
+  wiped. `src/lib/{types,format,cause,useAILoad}.ts` and the entire
+  `src/lib/seed/` directory carry forward unchanged.
+- `shadcn@latest init` against the existing Tailwind v4 + Next 16
+  + React 19 stack. Generates `components.json` (style: radix-nova,
+  base color: neutral, css variables: yes), `src/components/ui/`
+  (with a `button.tsx` to start), and `src/lib/utils.ts` with the
+  `cn()` helper.
+- `globals.css` rewritten with three `[data-theme]` scopes
+  (`operator` default, `blueprint`, `field`) under shadcn's variable
+  names (`--background`, `--foreground`, `--primary`, `--muted`,
+  `--border`, `--ring`, `--destructive`, etc.). Values move from hex
+  to **oklch** — the prompt specified HSL channels but modern
+  shadcn's convention is oklch (better perceptual uniformity, native
+  Tailwind v4 support, alpha modifiers still work via
+  `bg-primary/50`). Going with current shadcn convention since
+  Figma-kit interop is the whole point.
+- `--view-source` retained as a non-shadcn-standard token; cyan in
+  every theme so the ViewSourcePill primitive can mark VIEW-sourced
+  data without needing per-theme overrides.
+- `next/font/google` rewired in `src/app/layout.tsx`: shadcn injected
+  Geist as `--font-sans`; replaced with Inter Tight to keep the
+  product's existing typography. Fraunces (`--font-serif`) and
+  JetBrains Mono (`--font-mono`) unchanged.
+- `/swatches` test page renders the shadcn token palette under each
+  of the three themes side-by-side, plus radius scale, font sample,
+  and pill-tone preview using Tailwind's built-in palettes for the
+  sage/terracotta/amber/rose pill tones.
+
+Phase 2 onward (subsequent commits): shadcn primitive install
+(`button card badge tabs dialog ...`), domain primitive rebuild in
+`src/components/view/` (Pill, PageHeader, AIBlock, LoadingSteps,
+ReadinessTag, ViewSourcePill, TopNav), then the 18 routes.
 
 ### 2026-05-05 — Nonprofit workspace
 - **Field theme** added to globals.css: emerald `#16A34A` accent,
