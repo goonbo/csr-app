@@ -1,43 +1,65 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Sparkles, Check, Heart } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { fmtDate } from '@/lib/format';
-import { causeStyle } from '@/lib/cause';
-import { EVENTS } from '@/lib/seed/events';
-import { EMPLOYEES, EMPLOYEE_SIGNALS } from '@/lib/seed/employees';
-import type { Event, Cause } from '@/lib/types';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
+/**
+ * /me/profile — "Your impact" employee profile (Operator).
+ *
+ * 2-column layout (lg+ → 2fr/1fr):
+ *
+ * LEFT (2fr) — historical:
+ *   - Hours hero Card with a 64px tabular-nums display, copy line
+ *     framing the contribution ("Across {N} events and {M} cause(s)
+ *     — equivalent to a half-week …"), and an emerald gradient
+ *     initials avatar.
+ *   - "Where your time went" cause breakdown — bars colored by
+ *     causeStyle.gradient with hours number on the right; widths
+ *     normalized to the largest bucket.
+ *   - "Your timeline" — vertical TimelineRow list with cause-color
+ *     dots connected by a thin border line, eyebrow date, title,
+ *     partner + outputs, and an emerald "Heart Nh logged" pill.
+ *
+ * RIGHT (1fr) — preferences:
+ *   - "Causes you care about" — toggleable pill row (one per
+ *     cause); active state is emerald-tinted with a check icon.
+ *   - "How you like to volunteer" — large italic preferred-format
+ *     line + survey hint.
+ *   - AI consistency Card (cyan-tinted) recognizing the
+ *     contribution percentile.
+ */
 
-const ME_ID = 'u1';
-const MY_ATTENDED_IDS = ['e3', 'e4'];
+import { useState } from "react";
+import { Sparkles, Check, Heart } from "lucide-react";
+import { fmtDate } from "@/lib/format";
+import { causeStyle } from "@/lib/cause";
+import { EVENTS } from "@/lib/seed/events";
+import { EMPLOYEES, EMPLOYEE_SIGNALS } from "@/lib/seed/employees";
+import type { Event, Cause } from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/view/PageHeader";
+import { cn } from "@/lib/utils";
 
-// Per-attendee hours estimate — seed only carries event totals.
+const ME_ID = "u1";
+const MY_ATTENDED_IDS = ["e3", "e4"];
 const PER_EVENT_HOURS = 3;
 
 const ALL_CAUSES: Cause[] = [
-  'Food Security',
-  'Environment',
-  'Youth Education',
-  'Animal Welfare',
-  'Housing',
-  'Mental Health',
+  "Food Security",
+  "Environment",
+  "Youth Education",
+  "Animal Welfare",
+  "Housing",
+  "Mental Health",
 ];
 
 export default function EmployeeProfilePage() {
-  const me = EMPLOYEES.find(e => e.id === ME_ID);
-  if (!me) throw new Error('Missing employee seed for u1');
+  const me = EMPLOYEES.find((e) => e.id === ME_ID);
+  if (!me) throw new Error("Missing employee seed for u1");
 
-  const attended = EVENTS.filter(e => MY_ATTENDED_IDS.includes(e.id));
+  const attended = EVENTS.filter((e) => MY_ATTENDED_IDS.includes(e.id));
 
-  // Hours per cause — sums attended-event approximation
   const causeHours = new Map<string, number>();
   for (const e of attended) {
     causeHours.set(e.cause, (causeHours.get(e.cause) || 0) + PER_EVENT_HOURS);
   }
-  // Pad up to total — leftover hours allocated to first cause as "other engagements"
   const summed = Array.from(causeHours.values()).reduce((s, n) => s + n, 0);
   if (summed < me.hours && causeHours.size > 0) {
     const first = Array.from(causeHours.keys())[0];
@@ -48,15 +70,18 @@ export default function EmployeeProfilePage() {
     .map(([cause, hours]) => ({ cause: cause as Cause, hours }))
     .sort((a, b) => b.hours - a.hours);
 
-  const maxHours = Math.max(1, ...causeBreakdown.map(c => c.hours));
+  const maxHours = Math.max(1, ...causeBreakdown.map((c) => c.hours));
+  const initials = me.name
+    .split(" ")
+    .map((s) => s[0])
+    .join("");
 
-  const initials = me.name.split(' ').map(s => s[0]).join('');
-
-  // Editable cause preferences (mirrors EMPLOYEE_SIGNALS but interactive)
-  const [topCauses, setTopCauses] = useState<Cause[]>(EMPLOYEE_SIGNALS.topCauses);
+  const [topCauses, setTopCauses] = useState<Cause[]>(
+    EMPLOYEE_SIGNALS.topCauses,
+  );
   const toggleCause = (c: Cause) => {
-    setTopCauses(prev =>
-      prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c],
+    setTopCauses((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c],
     );
   };
 
@@ -68,113 +93,73 @@ export default function EmployeeProfilePage() {
         subtitle={`${me.dept} · CSR signal contributor`}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-        {/* LEFT — hours hero, cause breakdown, history */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Hours hero */}
-          <Card style={{ padding: 32 }}>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
+        <div className="flex flex-col gap-4">
+          <Card className="p-8">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <div style={{
-                  fontSize: 11, fontWeight: 700,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
-                  color: C.muted, marginBottom: 8,
-                }}>
+                <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                   Hours given · this year
                 </div>
-                <div style={{
-                  fontFamily: 'var(--font-h1), sans-serif',
-                  fontSize: 64, lineHeight: 1, color: C.ink,
-                  fontVariantNumeric: 'tabular-nums',
-                }}>
+                <div className="font-heading text-[64px] leading-none tabular-nums text-foreground">
                   {me.hours}
                 </div>
-                <div style={{
-                  fontSize: 13, color: C.inkLight,
-                  marginTop: 8, lineHeight: 1.55,
-                }}>
-                  Across {attended.length} events and {causeBreakdown.length} cause
-                  {causeBreakdown.length === 1 ? '' : 's'} — equivalent to{' '}
-                  <span style={{ fontStyle: 'italic', color: C.sageDeep }}>
+                <div className="mt-2 max-w-[420px] text-[13px] leading-relaxed text-foreground/70">
+                  Across {attended.length} events and {causeBreakdown.length}{" "}
+                  cause{causeBreakdown.length === 1 ? "" : "s"} — equivalent
+                  to{" "}
+                  <span className="italic text-primary">
                     a half-week of work given back to your community.
                   </span>
                 </div>
               </div>
               <div
                 aria-hidden="true"
-                style={{
-                  width: 88, height: 88, borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${C.sage}, ${C.sageLight})`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'white',
-                  fontSize: 28, fontWeight: 600,
-                  fontFamily: 'var(--font-h1), sans-serif',
-                  flexShrink: 0,
-                }}
+                className="flex size-[88px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 font-heading text-[28px] font-semibold text-white"
               >
                 {initials}
               </div>
             </div>
           </Card>
 
-          {/* Cause breakdown */}
           {causeBreakdown.length > 0 && (
-            <Card style={{ padding: 28 }}>
-              <h2 style={{
-                fontSize: 14, fontWeight: 600, color: C.ink,
-                margin: '0 0 16px',
-              }}>
+            <Card className="p-7">
+              <h2 className="mb-4 text-sm font-semibold text-foreground">
                 Where your time went
               </h2>
-              <div style={{
-                display: 'flex', flexDirection: 'column', gap: 14,
-              }}>
-                {causeBreakdown.map(b => {
+              <div className="flex flex-col gap-3.5">
+                {causeBreakdown.map((b) => {
                   const cs = causeStyle(b.cause);
                   const widthPct = Math.round((b.hours / maxHours) * 100);
                   return (
                     <div key={b.cause}>
-                      <div className="flex items-center justify-between" style={{
-                        fontSize: 12, marginBottom: 6,
-                      }}>
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          color: C.ink, fontWeight: 500,
-                        }}>
+                      <div className="mb-1.5 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 font-medium text-foreground">
                           <span
                             aria-hidden="true"
-                            style={{
-                              width: 10, height: 10, borderRadius: '50%',
-                              background: cs.gradient,
-                            }}
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundImage: cs.gradient }}
                           />
                           {b.cause}
                         </div>
-                        <span style={{
-                          fontFamily: 'var(--font-h1), sans-serif',
-                          fontSize: 16, color: C.ink,
-                          fontVariantNumeric: 'tabular-nums',
-                        }}>
+                        <span className="font-heading text-base tabular-nums text-foreground">
                           {b.hours}
-                          <span style={{
-                            fontSize: 11, color: C.muted, marginLeft: 3,
-                          }}>
+                          <span className="ml-0.5 text-[11px] text-muted-foreground">
                             h
                           </span>
                         </span>
                       </div>
                       <div
                         aria-hidden="true"
-                        style={{
-                          height: 6, borderRadius: 999,
-                          background: C.oat, overflow: 'hidden',
-                        }}
+                        className="h-1.5 overflow-hidden rounded-full bg-muted"
                       >
-                        <div style={{
-                          width: `${widthPct}%`,
-                          height: '100%',
-                          background: cs.gradient,
-                        }} />
+                        <div
+                          className="h-full"
+                          style={{
+                            width: `${widthPct}%`,
+                            backgroundImage: cs.gradient,
+                          }}
+                        />
                       </div>
                     </div>
                   );
@@ -183,20 +168,13 @@ export default function EmployeeProfilePage() {
             </Card>
           )}
 
-          {/* History */}
-          <Card style={{ padding: 28 }}>
-            <h2 style={{
-              fontSize: 14, fontWeight: 600, color: C.ink,
-              margin: '0 0 16px',
-            }}>
+          <Card className="p-7">
+            <h2 className="mb-4 text-sm font-semibold text-foreground">
               Your timeline
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="flex flex-col">
               {attended.length === 0 ? (
-                <p style={{
-                  fontSize: 13, color: C.muted, fontStyle: 'italic',
-                  margin: 0,
-                }}>
+                <p className="m-0 text-[13px] italic text-muted-foreground">
                   Your timeline starts with the first event you attend.
                 </p>
               ) : (
@@ -212,47 +190,38 @@ export default function EmployeeProfilePage() {
           </Card>
         </div>
 
-        {/* RIGHT — preferences */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <Card style={{ padding: 24 }}>
-            <h2 style={{
-              fontSize: 11, fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.06em',
-              color: C.muted, marginBottom: 12, marginTop: 0,
-            }}>
+        <div className="flex flex-col gap-4">
+          <Card className="p-6">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Causes you care about
             </h2>
-            <p style={{
-              fontSize: 12, color: C.inkLight,
-              lineHeight: 1.5, margin: '0 0 14px',
-            }}>
-              We use these to surface matches on your home and in opportunities.
+            <p className="mb-3.5 text-xs leading-relaxed text-foreground/70">
+              We use these to surface matches on your home and in
+              opportunities.
             </p>
-            <div className="flex flex-wrap" style={{ gap: 6 }}>
-              {ALL_CAUSES.map(c => {
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_CAUSES.map((c) => {
                 const active = topCauses.includes(c);
                 return (
                   <button
                     key={c}
+                    type="button"
                     onClick={() => toggleCause(c)}
-                    className="view-btn"
                     aria-pressed={active}
-                    style={{
-                      padding: '5px 12px',
-                      borderRadius: 999,
-                      fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-                      cursor: 'pointer',
-                      background: active ? C.sageGlow : 'transparent',
-                      color: active ? C.sageDeep : C.muted,
-                      borderTop: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
-                      borderRight: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
-                      borderBottom: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
-                      borderLeft: `1px solid ${active ? 'var(--accent)' : C.borderStrong}`,
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      transition: 'background 150ms, color 150ms, border-color 150ms',
-                    }}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                      active
+                        ? "border-primary/30 bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:bg-muted",
+                    )}
                   >
-                    {active && <Check size={10} strokeWidth={3} aria-hidden="true" />}
+                    {active && (
+                      <Check
+                        className="size-2.5"
+                        strokeWidth={3}
+                        aria-hidden="true"
+                      />
+                    )}
                     {c}
                   </button>
                 );
@@ -260,51 +229,36 @@ export default function EmployeeProfilePage() {
             </div>
           </Card>
 
-          <Card style={{ padding: 24 }}>
-            <h2 style={{
-              fontSize: 11, fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.06em',
-              color: C.muted, marginBottom: 12, marginTop: 0,
-            }}>
+          <Card className="p-6">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               How you like to volunteer
             </h2>
-            <div style={{
-              fontSize: 13, color: C.ink, lineHeight: 1.55,
-            }}>
-              <span style={{ fontFamily: 'var(--font-h1), sans-serif', fontSize: 16, fontStyle: 'italic' }}>
+            <div className="text-[13px] leading-relaxed text-foreground">
+              <span className="font-heading text-base italic">
                 {EMPLOYEE_SIGNALS.preferredFormat}.
               </span>
-              <div style={{
-                fontSize: 12, color: C.muted, marginTop: 8,
-              }}>
+              <div className="mt-2 text-xs text-muted-foreground">
                 Adjust this in survey before your next quarterly check-in.
               </div>
             </div>
           </Card>
 
-          <Card ai style={{ padding: 18 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+          <Card className="bg-view-source-muted/40 ring-view-source/30 p-4">
+            <div className="flex items-start gap-2.5">
               <div
                 aria-hidden="true"
-                style={{
-                  width: 28, height: 28, borderRadius: '50%', background: C.sage,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-white"
               >
-                <Sparkles size={12} color="white" strokeWidth={2.2} />
+                <Sparkles className="size-3" strokeWidth={2.2} />
               </div>
               <div>
-                <div style={{
-                  fontSize: 13, fontWeight: 600,
-                  color: C.ink, marginBottom: 4,
-                }}>
+                <div className="mb-1 text-[13px] font-semibold text-foreground">
                   You&rsquo;re consistent.
                 </div>
-                <div style={{
-                  fontSize: 12, color: C.inkLight, lineHeight: 1.55,
-                }}>
-                  18h across two quarters puts you in the top 18% of contributors at CloudMotion. Sarah may reach out about being a captain next event.
+                <div className="text-xs leading-relaxed text-foreground/70">
+                  18h across two quarters puts you in the top 18% of
+                  contributors at CloudMotion. Sarah may ask you to
+                  captain the next event.
                 </div>
               </div>
             </div>
@@ -315,84 +269,50 @@ export default function EmployeeProfilePage() {
   );
 }
 
-function TimelineRow({ event, isLast }: { event: Event; isLast: boolean }) {
+function TimelineRow({
+  event,
+  isLast,
+}: {
+  event: Event;
+  isLast: boolean;
+}) {
   const cs = causeStyle(event.cause);
   return (
     <div
-      style={{
-        display: 'flex', gap: 14,
-        paddingBottom: isLast ? 0 : 18,
-        position: 'relative',
-      }}
+      className={cn("relative flex gap-3.5", !isLast && "pb-5")}
     >
-      {/* dot + connecting line */}
-      <div style={{
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: 12,
-      }}>
+      <div className="flex w-3 shrink-0 flex-col items-center">
         <span
           aria-hidden="true"
-          style={{
-            width: 12, height: 12, borderRadius: '50%',
-            background: cs.gradient,
-            marginTop: 4,
-          }}
+          className="mt-1 size-3 rounded-full"
+          style={{ backgroundImage: cs.gradient }}
         />
         {!isLast && (
           <span
             aria-hidden="true"
-            style={{
-              width: 1, flex: 1,
-              background: C.border,
-              marginTop: 4,
-            }}
+            className="mt-1 w-px flex-1 bg-border"
           />
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, paddingBottom: 4 }}>
-        <div style={{
-          fontSize: 11, fontWeight: 600,
-          textTransform: 'uppercase', letterSpacing: '0.06em',
-          color: C.muted, marginBottom: 2,
-        }}>
-          {event.date ? fmtDate(event.date) : 'Date pending'}
+      <div className="min-w-0 flex-1 pb-1">
+        <div className="mb-0.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {event.date ? fmtDate(event.date) : "Date pending"}
         </div>
-        <div style={{
-          fontSize: 14, fontWeight: 500,
-          color: C.ink, marginBottom: 4,
-        }}>
+        <div className="mb-1 text-sm font-medium text-foreground">
           {event.title}
         </div>
-        <div style={{
-          fontSize: 12, color: C.inkLight, lineHeight: 1.55,
-        }}>
-          {event.partner ?? 'Independent'}
+        <div className="text-xs leading-relaxed text-foreground/70">
+          {event.partner ?? "Independent"}
           {event.outputs && (
             <>
-              {' · '}
-              <span style={{ fontStyle: 'italic' }}>{event.outputs}</span>
+              {" · "}
+              <span className="italic">{event.outputs}</span>
             </>
           )}
         </div>
-        <div style={{
-          marginTop: 8,
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          fontSize: 11,
-          padding: '3px 10px',
-          borderRadius: 999,
-          background: C.sageGlow,
-          color: C.sageDeep,
-          borderTop: '1px solid var(--accent)',
-          borderRight: '1px solid var(--accent)',
-          borderBottom: '1px solid var(--accent)',
-          borderLeft: '1px solid var(--accent)',
-          fontWeight: 600,
-        }}>
-          <Heart size={10} strokeWidth={2.4} aria-hidden="true" />
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+          <Heart className="size-2.5" strokeWidth={2.4} aria-hidden="true" />
           {PER_EVENT_HOURS}h logged
         </div>
       </div>

@@ -1,32 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Sparkles, Check, RefreshCw, Send } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { useAILoad } from '@/lib/useAILoad';
-import { AI_PLAN } from '@/lib/seed/ai-plan';
-import type { AIPlan } from '@/lib/types';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { Pill } from '@/components/primitives/Pill';
-import { Button } from '@/components/primitives/Button';
-import { AIBlock } from '@/components/primitives/AIBlock';
-import { LoadingSteps } from '@/components/primitives/LoadingSteps';
+/**
+ * /events/new — event builder with the AI plan flow.
+ *
+ * Two states:
+ *   1. Pre-plan — single textarea, Sarah describes the event in her
+ *      own words. "Plan this with me" triggers the synthetic AI flow.
+ *   2. Post-plan — AI-acknowledged intro Card, suggested-capacity hero,
+ *      four editable AIBlock drafts (Slack post, all-hands email,
+ *      manager-forward note, internal brief), and a sticky action
+ *      bar at the bottom (Publish / Save as draft / Start over).
+ */
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Sparkles, Check, RefreshCw, Send } from "lucide-react";
+import { useAILoad } from "@/lib/useAILoad";
+import { AI_PLAN } from "@/lib/seed/ai-plan";
+import type { AIPlan } from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Pill } from "@/components/view/Pill";
+import { PageHeader } from "@/components/view/PageHeader";
+import { AIBlock } from "@/components/view/AIBlock";
+import { LoadingSteps } from "@/components/view/LoadingSteps";
 
 const PLAN_STEPS = [
-  'Listening to what you described…',
-  'Considering capacity and partner fit…',
-  'Drafting comms for your team…',
-  'Pulling everything together…',
+  "Listening to what you described…",
+  "Considering capacity and partner fit…",
+  "Drafting comms for your team…",
+  "Pulling everything together…",
 ];
 
 const EXAMPLE_PROMPT =
-  'Food bank day in March for the Austin office, hands-on, half day, want to do this on a Friday';
+  "Food bank day in March for the Austin office, hands-on, half day, want to do this on a Friday";
 
 export default function EventNewPage() {
   const router = useRouter();
-  const [desc, setDesc] = useState('');
+  const [desc, setDesc] = useState("");
   const [plan, setPlan] = useState<AIPlan | null>(null);
   const ai = useAILoad(PLAN_STEPS, 3600);
 
@@ -38,105 +50,65 @@ export default function EventNewPage() {
   const startOver = () => {
     setPlan(null);
     ai.reset();
-    setDesc('');
+    setDesc("");
   };
 
   return (
     <div>
       <PageHeader
         back="All events"
-        onBack={() => router.push('/events')}
+        onBack={() => router.push("/events")}
         greeting="A new event"
         title="Tell us what you're imagining."
         subtitle="Describe it however feels natural. We'll handle the capacity, the comms, and the brief — you review and tweak."
       />
 
       {!plan && (
-        <div style={{ maxWidth: 768 }}>
-          <Card style={{ padding: 32 }}>
+        <div className="max-w-3xl">
+          <Card className="p-8">
             <label
               htmlFor="event-desc"
-              style={{
-                display: 'block',
-                fontSize: 11, fontWeight: 700,
-                textTransform: 'uppercase', letterSpacing: '0.06em',
-                color: C.muted, marginBottom: 12,
-              }}
+              className="mb-3 block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
             >
               In your own words
             </label>
-            <textarea
+            <Textarea
               id="event-desc"
               value={desc}
-              onChange={e => setDesc(e.target.value)}
+              onChange={(e) => setDesc(e.target.value)}
               placeholder={EXAMPLE_PROMPT}
               rows={3}
-              className="view-input"
-              style={{
-                width: '100%',
-                padding: '8px 0',
-                background: 'transparent',
-                border: 'none',
-                resize: 'none',
-                fontFamily: 'var(--font-h1), sans-serif',
-                fontSize: 20,
-                color: C.ink,
-                lineHeight: 1.4,
-                outline: 'none',
-              }}
+              className="resize-none border-0 bg-transparent px-0 py-2 font-heading text-xl leading-snug text-foreground shadow-none focus-visible:ring-0 placeholder:text-muted-foreground/70 dark:bg-transparent"
             />
-            <div
-              className="flex flex-wrap items-center justify-between gap-3"
-              style={{
-                marginTop: 24,
-                paddingTop: 20,
-                borderTop: `1px solid ${C.border}`,
-              }}
-            >
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
               <button
+                type="button"
                 onClick={() => setDesc(EXAMPLE_PROMPT)}
-                className="view-btn"
-                style={{
-                  fontSize: 12,
-                  color: C.muted,
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 4,
-                  borderRadius: 4,
-                  fontFamily: 'inherit',
-                }}
+                className="rounded p-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 Try the example →
               </button>
               <Button
-                variant="ai"
-                icon={Sparkles}
                 onClick={generate}
                 disabled={ai.active || !desc.trim()}
               >
-                {ai.active ? 'Working on it…' : 'Plan this with me'}
+                <Sparkles className="size-4" aria-hidden="true" />
+                {ai.active ? "Working on it…" : "Plan this with me"}
               </Button>
             </div>
           </Card>
 
           {ai.active && (
-            <div style={{ marginTop: 16 }}>
-              <Card ai style={{ padding: 24 }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center',
-                  gap: 8, marginBottom: 16,
-                }}>
+            <div className="mt-4">
+              <Card className="bg-view-source-muted/40 ring-view-source/30 p-6">
+                <div className="mb-4 flex items-center gap-2">
                   <div
-                    style={{
-                      width: 28, height: 28, borderRadius: '50%', background: C.sage,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
                     aria-hidden="true"
+                    className="flex size-7 items-center justify-center rounded-full bg-view-source text-white"
                   >
-                    <Sparkles size={12} color="white" strokeWidth={2.2} />
+                    <Sparkles className="size-3" />
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: C.sageDeep }}>
+                  <span className="text-[13px] font-semibold text-view-source-foreground">
                     Putting your event together…
                   </span>
                 </div>
@@ -148,66 +120,42 @@ export default function EventNewPage() {
       )}
 
       {plan && (
-        <div
-          style={{
-            maxWidth: 960,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-          }}
-        >
+        <div className="flex max-w-4xl flex-col gap-4">
           {/* Intro */}
-          <Card ai style={{ padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Card className="bg-view-source-muted/40 ring-view-source/30 p-4">
+            <div className="flex items-center gap-3">
               <div
-                style={{
-                  width: 28, height: 28, borderRadius: '50%', background: C.sage,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}
                 aria-hidden="true"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-white"
               >
-                <Check size={13} color="white" strokeWidth={3} />
+                <Check className="size-3.5" strokeWidth={3} />
               </div>
-              <div style={{ fontSize: 13, color: C.sageDeep, lineHeight: 1.55 }}>
-                <span style={{ fontWeight: 600 }}>Here&rsquo;s a draft.</span>{' '}
-                Take a look at each piece — edit anything, regenerate what doesn&rsquo;t feel right.
-              </div>
+              <p className="text-[13px] leading-relaxed text-view-source-foreground">
+                <span className="font-semibold">Here&rsquo;s a draft.</span>{" "}
+                Take a look at each piece — edit anything, regenerate what
+                doesn&rsquo;t feel right.
+              </p>
             </div>
           </Card>
 
           {/* Suggested capacity */}
-          <Card style={{ padding: 28 }}>
-            <div className="flex flex-wrap items-center justify-between gap-3" style={{ marginBottom: 12 }}>
+          <Card className="p-7">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div style={{
-                  fontSize: 11, fontWeight: 700,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
-                  color: C.muted, marginBottom: 8,
-                }}>
+                <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                   Suggested capacity
                 </div>
-                <div style={{
-                  fontFamily: 'var(--font-h1), sans-serif',
-                  fontSize: 52, lineHeight: 1, color: C.ink,
-                }}>
+                <div className="flex items-baseline gap-2 font-heading text-[52px] leading-none text-foreground">
                   {plan.capacity}
-                  <span style={{
-                    fontSize: 16, marginLeft: 8,
-                    color: C.muted, fontStyle: 'italic',
-                  }}>
+                  <span className="text-base italic text-muted-foreground">
                     volunteers
                   </span>
                 </div>
               </div>
               <Pill tone="sage" icon={Sparkles}>AI suggested</Pill>
             </div>
-            <div style={{
-              marginTop: 16,
-              paddingLeft: 16,
-              borderLeft: `2px solid ${C.sage}`,
-            }}>
-              <p style={{ fontSize: 13, lineHeight: 1.6, color: C.inkLight, margin: 0 }}>
+            <div className="mt-4 border-l-2 border-primary pl-4">
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
                 {plan.capacityReason}
               </p>
             </div>
@@ -216,69 +164,37 @@ export default function EventNewPage() {
           {/* 4 AIBlock content cards */}
           {(
             [
-              { label: 'Slack / Teams post', content: plan.teamsPost },
-              { label: 'All-hands email', subject: plan.emailSubject, content: plan.emailBody },
-              { label: 'Manager-forward note', content: plan.managerNote },
-              { label: 'Internal event brief', content: plan.brief },
+              { label: "Slack / Teams post",      content: plan.teamsPost },
+              { label: "All-hands email",         subject: plan.emailSubject, content: plan.emailBody },
+              { label: "Manager-forward note",    content: plan.managerNote },
+              { label: "Internal event brief",    content: plan.brief },
             ] as const
           ).map((piece, i) => (
-            <Card key={i} style={{ padding: 28 }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 16,
-                gap: 12,
-                flexWrap: 'wrap',
-              }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: 0 }}>
+            <Card key={i} className="p-7">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-foreground">
                   {piece.label}
                 </h3>
                 <button
-                  className="view-btn"
-                  style={{
-                    fontSize: 11,
-                    color: C.muted,
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 4,
-                    borderRadius: 4,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontFamily: 'inherit',
-                  }}
+                  type="button"
+                  className="inline-flex items-center gap-1 rounded p-1 text-[11px] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  <RefreshCw size={11} aria-hidden="true" /> Regenerate
+                  <RefreshCw className="size-3" aria-hidden="true" />
+                  Regenerate
                 </button>
               </div>
               <AIBlock label="AI draft · editable">
-                {'subject' in piece && piece.subject && (
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{
-                      fontSize: 10, fontWeight: 700,
-                      textTransform: 'uppercase', letterSpacing: '0.06em',
-                      color: C.muted, marginBottom: 4,
-                    }}>
+                {"subject" in piece && piece.subject && (
+                  <div className="mb-3">
+                    <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Subject
                     </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>
+                    <div className="text-sm font-semibold text-foreground">
                       {piece.subject}
                     </div>
                   </div>
                 )}
-                <pre
-                  style={{
-                    fontSize: 13,
-                    lineHeight: 1.6,
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    fontFamily: 'var(--font-sans), "DM Sans", sans-serif',
-                    color: C.inkLight,
-                    margin: 0,
-                  }}
-                >
+                <pre className="m-0 whitespace-pre-wrap break-words font-sans text-[13px] leading-relaxed text-muted-foreground">
                   {piece.content}
                 </pre>
               </AIBlock>
@@ -286,22 +202,17 @@ export default function EventNewPage() {
           ))}
 
           {/* Sticky action bar */}
-          <div style={{ position: 'sticky', bottom: 16, marginTop: 16, zIndex: 10 }}>
-            <Card
-              style={{
-                padding: 16,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              }}
-            >
+          <div className="sticky bottom-4 z-10 mt-4">
+            <Card className="p-4 shadow-lg">
               <div className="flex flex-wrap items-center gap-3">
-                <Button
-                  variant="accent"
-                  icon={Send}
-                  onClick={() => router.push('/events')}
-                >
+                <Button onClick={() => router.push("/events")}>
+                  <Send className="size-4" aria-hidden="true" />
                   Publish &amp; send comms
                 </Button>
-                <Button variant="soft" onClick={() => router.push('/events')}>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/events")}
+                >
                   Save as draft
                 </Button>
                 <Button variant="ghost" onClick={startOver}>

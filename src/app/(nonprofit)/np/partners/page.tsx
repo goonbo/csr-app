@@ -1,105 +1,135 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { fmtDate } from '@/lib/format';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { ViewSourcePill } from '@/components/primitives/ViewSourcePill';
-import { NP_CORPORATE_PARTNERS } from '@/lib/seed/np-corporate-partners';
-import type { CorporatePartner } from '@/lib/types';
+/**
+ * /np/partners — corporate partners list (Field theme).
+ *
+ * PageHeader: "Your relationships" eyebrow + "Corporate partners."
+ * H1 + subtitle with VIEW vs direct counts and pending-request
+ * call-out.
+ *
+ * Filter Tabs (rounded-full): All / Via VIEW (cyan dot) / Direct /
+ * At-risk relationships (amber dot). Each label suffixed with a
+ * count.
+ *
+ * Grid (1-col → 2-col at md): one PartnerCard per partner.
+ * Cards carry a 4px left-border that encodes their primary status:
+ *   - amber-500 if at-risk
+ *   - view-source (cyan) if VIEW-sourced
+ *   - border (neutral) otherwise
+ *
+ * Card sections:
+ *   header  — name + ViewSourcePill, industry, deterministic Logo
+ *   chips   — HealthPill, optional Lapsed pill (no activity in 6+
+ *             months), optional Pending-request emerald pill
+ *   stats   — Years / Events YTD / Hours YTD with mono numerals,
+ *             dividing rule above
+ *   footer  — contact name + last activity + chevron
+ *
+ * Empty state: muted Card "No partners match this view."
+ */
 
-type Filter = 'all' | 'view' | 'direct' | 'at-risk';
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { fmtDate } from "@/lib/format";
+import { NP_CORPORATE_PARTNERS } from "@/lib/seed/np-corporate-partners";
+import type { CorporatePartner } from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/view/PageHeader";
+import { ViewSourcePill } from "@/components/view/ViewSourcePill";
+import { cn } from "@/lib/utils";
+
+type Filter = "all" | "view" | "direct" | "at-risk";
 
 const FILTERS: { id: Filter; label: string }[] = [
-  { id: 'all',     label: 'All partners' },
-  { id: 'view',    label: 'Via VIEW' },
-  { id: 'direct',  label: 'Direct' },
-  { id: 'at-risk', label: 'At-risk relationships' },
+  { id: "all", label: "All partners" },
+  { id: "view", label: "Via VIEW" },
+  { id: "direct", label: "Direct" },
+  { id: "at-risk", label: "At-risk relationships" },
 ];
 
 export default function PartnersPage() {
   const router = useRouter();
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = useMemo(() => {
-    return NP_CORPORATE_PARTNERS.filter(p => {
-      if (filter === 'view')    return p.source === 'view-partner';
-      if (filter === 'direct')  return p.source !== 'view-partner';
-      if (filter === 'at-risk') return p.relationshipHealth === 'at-risk';
+    return NP_CORPORATE_PARTNERS.filter((p) => {
+      if (filter === "view") return p.source === "view-partner";
+      if (filter === "direct") return p.source !== "view-partner";
+      if (filter === "at-risk") return p.relationshipHealth === "at-risk";
       return true;
     });
   }, [filter]);
 
-  const counts = useMemo(() => ({
-    all:     NP_CORPORATE_PARTNERS.length,
-    view:    NP_CORPORATE_PARTNERS.filter(p => p.source === 'view-partner').length,
-    direct:  NP_CORPORATE_PARTNERS.filter(p => p.source !== 'view-partner').length,
-    'at-risk': NP_CORPORATE_PARTNERS.filter(p => p.relationshipHealth === 'at-risk').length,
-  } as Record<Filter, number>), []);
+  const counts = useMemo(
+    () =>
+      ({
+        all: NP_CORPORATE_PARTNERS.length,
+        view: NP_CORPORATE_PARTNERS.filter((p) => p.source === "view-partner")
+          .length,
+        direct: NP_CORPORATE_PARTNERS.filter((p) => p.source !== "view-partner")
+          .length,
+        "at-risk": NP_CORPORATE_PARTNERS.filter(
+          (p) => p.relationshipHealth === "at-risk",
+        ).length,
+      }) as Record<Filter, number>,
+    [],
+  );
 
-  const pendingCount = NP_CORPORATE_PARTNERS.filter(p => p.pendingRequest).length;
+  const pendingCount = NP_CORPORATE_PARTNERS.filter(
+    (p) => p.pendingRequest,
+  ).length;
+
+  const subtitle = `${NP_CORPORATE_PARTNERS.length} active relationships — ${counts.view} managed via VIEW, ${counts.direct} direct.${
+    pendingCount > 0
+      ? ` ${pendingCount} pending request${pendingCount > 1 ? "s" : ""} need a reply.`
+      : ""
+  }`;
 
   return (
     <div>
       <PageHeader
         greeting="Your relationships"
         title="Corporate partners."
-        subtitle={`${NP_CORPORATE_PARTNERS.length} active relationships — ${counts.view} managed via VIEW, ${counts.direct} direct.${pendingCount > 0 ? ` ${pendingCount} pending request${pendingCount > 1 ? 's' : ''} need a reply.` : ''}`}
+        subtitle={subtitle}
       />
 
-      {/* Filter pills */}
-      <div role="tablist" aria-label="Filter partners" style={{
-        display: 'flex', flexWrap: 'wrap', gap: 4,
-        padding: 4, borderRadius: 999,
-        background: C.oat, border: `1px solid ${C.border}`,
-        width: 'fit-content', marginBottom: 24,
-      }}>
-        {FILTERS.map(f => {
-          const active = filter === f.id;
-          return (
-            <button
+      <Tabs
+        value={filter}
+        onValueChange={(v) => setFilter(v as Filter)}
+        className="mb-6"
+      >
+        <TabsList className="rounded-full" aria-label="Filter partners">
+          {FILTERS.map((f) => (
+            <TabsTrigger
               key={f.id}
-              role="tab"
-              aria-selected={active}
-              onClick={() => setFilter(f.id)}
-              className="view-btn"
-              style={{
-                padding: '6px 14px', borderRadius: 999,
-                fontSize: 13, fontWeight: 500, fontFamily: 'inherit',
-                color: active ? C.ink : C.muted,
-                background: active ? C.paper : 'transparent',
-                boxShadow: active ? '0 1px 3px rgba(10,26,46,0.06)' : 'none',
-                border: 'none', cursor: 'pointer',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
+              value={f.id}
+              className="rounded-full px-3"
             >
-              {f.id === 'view' && (
-                <span style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: 'var(--view-source)',
-                }} aria-hidden="true" />
+              {f.id === "view" && (
+                <span
+                  aria-hidden="true"
+                  className="size-1.5 shrink-0 rounded-full bg-view-source"
+                />
               )}
-              {f.id === 'at-risk' && (
-                <span style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: 'var(--amber)',
-                }} aria-hidden="true" />
+              {f.id === "at-risk" && (
+                <span
+                  aria-hidden="true"
+                  className="size-1.5 shrink-0 rounded-full bg-amber-500"
+                />
               )}
               {f.label}
-              <span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>
+              <span className="text-[11px] font-semibold text-muted-foreground">
                 {counts[f.id]}
               </span>
-            </button>
-          );
-        })}
-      </div>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
-      {/* Partner cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map(p => (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {filtered.map((p) => (
           <PartnerCard
             key={p.id}
             partner={p}
@@ -109,8 +139,8 @@ export default function PartnersPage() {
       </div>
 
       {filtered.length === 0 && (
-        <Card style={{ padding: 32 }}>
-          <div style={{ fontSize: 14, color: C.inkLight }}>
+        <Card className="bg-muted/40 p-8">
+          <div className="text-sm text-foreground/70">
             No partners match this view.
           </div>
         </Card>
@@ -132,118 +162,106 @@ function PartnerCard({
     return new Date(p.lastActivityAt) < sixMonthsAgo;
   })();
 
+  const borderTone =
+    p.relationshipHealth === "at-risk"
+      ? "border-l-amber-500"
+      : p.source === "view-partner"
+        ? "border-l-view-source"
+        : "border-l-border";
+
   return (
     <Card
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      style={{
-        padding: 0, overflow: 'hidden',
-        borderLeft: p.relationshipHealth === 'at-risk'
-          ? `3px solid var(--amber)`
-          : p.source === 'view-partner'
-            ? `3px solid var(--view-source)`
-            : `3px solid ${C.border}`,
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
       }}
+      className={cn(
+        "cursor-pointer gap-0 p-0 transition-shadow hover:ring-foreground/15",
+        "border-l-4",
+        borderTone,
+      )}
     >
-      <div style={{ padding: 22 }}>
-        <div style={{
-          display: 'flex', alignItems: 'flex-start',
-          justifyContent: 'space-between', gap: 12,
-          marginBottom: 14,
-        }}>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              flexWrap: 'wrap', marginBottom: 6,
-            }}>
-              <h3 style={{
-                fontFamily: 'var(--font-h1), sans-serif',
-                fontSize: 18, fontWeight: 600,
-                color: C.ink, margin: 0,
-                letterSpacing: '-0.01em',
-              }}>
+      <div className="p-5">
+        <div className="mb-3.5 flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 flex flex-wrap items-center gap-2">
+              <h3 className="m-0 font-heading text-lg font-semibold tracking-tight text-foreground">
                 {p.name}
               </h3>
-              {p.source === 'view-partner' && <ViewSourcePill partner={p.name} size="sm" />}
+              {p.source === "view-partner" && (
+                <ViewSourcePill partner={p.name} size="sm" />
+              )}
             </div>
-            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.4 }}>
+            <div className="text-xs leading-tight text-muted-foreground">
               {p.industry}
             </div>
           </div>
           <Logo name={p.name} />
         </div>
 
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          gap: 8, flexWrap: 'wrap', marginBottom: 14,
-        }}>
+        <div className="mb-3.5 flex flex-wrap items-center gap-2">
           <HealthPill health={p.relationshipHealth} />
           {isLapsed && (
-            <span style={{
-              fontSize: 10, fontWeight: 600,
-              padding: '2px 8px', borderRadius: 999,
-              color: C.muted, background: 'transparent',
-              border: `1px solid ${C.borderStrong}`,
-              letterSpacing: '0.02em', textTransform: 'uppercase',
-            }}>
+            <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               Lapsed
             </span>
           )}
           {p.pendingRequest && (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              fontSize: 10, fontWeight: 700,
-              padding: '2px 8px', borderRadius: 999,
-              color: 'var(--accent-deep)', background: C.sageGlow,
-              border: `1px solid ${C.sage}`,
-              letterSpacing: '0.04em', textTransform: 'uppercase',
-            }}>
-              <Sparkles size={9} strokeWidth={2.6} aria-hidden="true" />
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
+              <Sparkles
+                className="size-2.5"
+                strokeWidth={2.6}
+                aria-hidden="true"
+              />
               Pending request
             </span>
           )}
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 12, marginBottom: 14,
-          paddingTop: 14, borderTop: `1px solid ${C.border}`,
-        }}>
+        <div className="mb-3.5 grid grid-cols-3 gap-3 border-t border-border pt-3.5">
           <Stat label="Years" value={p.yearsActive.toString()} />
           <Stat label="Events YTD" value={p.eventsHostedYtd.toString()} />
           <Stat label="Hours YTD" value={p.hoursHostedYtd.toString()} />
         </div>
 
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between',
-          fontSize: 12, color: C.muted,
-        }}>
-          <span>
+        <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span className="truncate">
             {p.contactName} · last activity {fmtDate(p.lastActivityAt, false)}
           </span>
-          <ArrowRight size={14} aria-hidden="true" />
+          <ArrowRight className="size-3.5 shrink-0" aria-hidden="true" />
         </div>
       </div>
     </Card>
   );
 }
 
-function HealthPill({ health }: { health: CorporatePartner['relationshipHealth'] }) {
-  const config = {
-    thriving: { bg: 'var(--accent-glow)',   color: 'var(--accent-deep)', border: 'var(--accent)', label: 'Thriving' },
-    steady:   { bg: C.oat,                  color: C.inkLight,           border: C.borderStrong,   label: 'Steady' },
-    'at-risk':{ bg: 'var(--amber-bg)',      color: 'var(--amber-fg)',    border: 'var(--amber)',   label: 'At risk' },
-  } as const;
-  const c = config[health];
+function HealthPill({
+  health,
+}: {
+  health: CorporatePartner["relationshipHealth"];
+}) {
+  if (health === "thriving") {
+    return (
+      <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-900">
+        Thriving
+      </span>
+    );
+  }
+  if (health === "at-risk") {
+    return (
+      <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-900">
+        At risk
+      </span>
+    );
+  }
   return (
-    <span style={{
-      fontSize: 11, fontWeight: 600,
-      padding: '2px 9px', borderRadius: 999,
-      color: c.color, background: c.bg,
-      border: `1px solid ${c.border}`,
-    }}>
-      {c.label}
+    <span className="inline-flex items-center rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
+      Steady
     </span>
   );
 }
@@ -251,55 +269,43 @@ function HealthPill({ health }: { health: CorporatePartner['relationshipHealth']
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div style={{
-        fontSize: 9.5, fontWeight: 600, color: C.muted,
-        letterSpacing: '0.06em', textTransform: 'uppercase',
-        marginBottom: 4,
-      }}>
+      <div className="mb-1 text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </div>
-      <div style={{
-        fontFamily: 'var(--font-h1), sans-serif',
-        fontSize: 18, fontWeight: 600, color: C.ink,
-        fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-0.01em',
-      }}>
+      <div className="font-heading text-lg font-semibold tabular-nums tracking-tight text-foreground">
         {value}
       </div>
     </div>
   );
 }
 
+const LOGO_PALETTE = [
+  ["#0A1A2E", "#1E40AF"],
+  ["#16A34A", "#15803D"],
+  ["#7C3AED", "#5B21B6"],
+  ["#EA580C", "#9A3412"],
+  ["#0891B2", "#0E4F65"],
+  ["#DB2777", "#9D174D"],
+  ["#D97706", "#92400E"],
+  ["#475569", "#1E293B"],
+];
+
 function Logo({ name }: { name: string }) {
-  // Deterministic colors from the partner name. Operator-Field-friendly
-  // — these are placeholder logo blocks, not the real brand.
-  const initials = name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  const palette = [
-    ['#0A1A2E', '#1E40AF'],
-    ['#16A34A', '#15803D'],
-    ['#7C3AED', '#5B21B6'],
-    ['#EA580C', '#9A3412'],
-    ['#0891B2', '#0E4F65'],
-    ['#DB2777', '#9D174D'],
-    ['#D97706', '#92400E'],
-    ['#475569', '#1E293B'],
-  ];
+  const initials = name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
   let h = 0;
   for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const [a, b] = palette[h % palette.length];
+  const [a, b] = LOGO_PALETTE[h % LOGO_PALETTE.length];
 
   return (
     <div
       aria-hidden="true"
-      style={{
-        width: 44, height: 44,
-        borderRadius: 'var(--radius)',
-        background: `linear-gradient(135deg, ${a}, ${b})`,
-        color: '#FFFFFF', fontSize: 14, fontWeight: 700,
-        letterSpacing: '-0.02em',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}
+      className="flex size-11 shrink-0 items-center justify-center rounded-md text-sm font-bold tracking-tight text-white"
+      style={{ backgroundImage: `linear-gradient(135deg, ${a}, ${b})` }}
     >
       {initials}
     </div>

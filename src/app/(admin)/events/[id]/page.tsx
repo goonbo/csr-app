@@ -1,47 +1,62 @@
-'use client';
+"use client";
 
-import { use } from 'react';
-import { useRouter, notFound } from 'next/navigation';
+/**
+ * /events/[id] — event detail.
+ *
+ * Renders different blocks based on the event's pipeline stage:
+ *   - at-risk → AtRiskDiagnosis card with confidence-tagged causes
+ *     and the options-on-the-table tray
+ *   - recruiting / at-risk → Day-of command center with live
+ *     attendance variance, supply check, captains, incident log
+ *   - sourcing / vetting / proposed / confirmed → StageNote
+ *   - completed → AttendeesList + ReconciliationQueue + outputs
+ *
+ * Right rail always carries Event details + Partner link.
+ */
+
+import { use } from "react";
+import { useRouter, notFound } from "next/navigation";
 import {
   Sparkles, Edit3, Send, AlertCircle, CheckCircle2,
   ChevronRight, Users, Check,
-} from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { fmtDate } from '@/lib/format';
-import { EVENTS } from '@/lib/seed/events';
-import { EMPLOYEES } from '@/lib/seed/employees';
-import { pipelineConfig } from '@/lib/seed/pipeline';
+} from "lucide-react";
+import { fmtDate } from "@/lib/format";
+import { EVENTS } from "@/lib/seed/events";
+import { EMPLOYEES } from "@/lib/seed/employees";
+import { pipelineConfig } from "@/lib/seed/pipeline";
 import type {
   Event as EventType, Diagnosis, AtRiskOption,
   Reconciliation, Employee,
-} from '@/lib/types';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { Pill } from '@/components/primitives/Pill';
-import { Button } from '@/components/primitives/Button';
+} from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Pill } from "@/components/view/Pill";
+import { PageHeader } from "@/components/view/PageHeader";
+import { cn } from "@/lib/utils";
 
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
 interface AttendeeRow extends Employee {
-  status: 'attended' | 'no_show' | 'registered';
+  status: "attended" | "no_show" | "registered";
   hrs: number;
 }
 
 export default function EventDetailPage({ params }: EventDetailPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const event = EVENTS.find(e => e.id === id);
+  const event = EVENTS.find((e) => e.id === id);
   if (!event) notFound();
 
-  const isDone = event.status === 'completed';
+  const isDone = event.status === "completed";
   const stage = pipelineConfig(event.pipeline);
-  const showCommandCenter = event.pipeline === 'recruiting' || event.pipeline === 'at-risk';
+  const showCommandCenter =
+    event.pipeline === "recruiting" || event.pipeline === "at-risk";
 
   const attendees: AttendeeRow[] = EMPLOYEES.slice(0, 5).map((u, i) => ({
     ...u,
-    status: isDone ? (i === 4 ? 'no_show' : 'attended') : 'registered',
+    status: isDone ? (i === 4 ? "no_show" : "attended") : "registered",
     hrs: isDone && i < 4 ? 3 : 0,
   }));
 
@@ -50,52 +65,53 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
   if (event.time) subtitleParts.push(event.time);
   if (event.location) subtitleParts.push(event.location);
   const subtitle = subtitleParts.length
-    ? subtitleParts.join(' · ')
-    : 'Date and location pending';
+    ? subtitleParts.join(" · ")
+    : "Date and location pending";
 
   return (
     <div>
       <PageHeader
         back="All events"
-        onBack={() => router.push('/events')}
-        greeting={event.partner ?? 'Partner pending'}
+        onBack={() => router.push("/events")}
+        greeting={event.partner ?? "Partner pending"}
         title={event.title}
         subtitle={subtitle}
         action={
           isDone ? (
-            <Button
-              variant="ai"
-              icon={Sparkles}
-              onClick={() => router.push(`/events/${event.id}/recap`)}
-            >
+            <Button onClick={() => router.push(`/events/${event.id}/recap`)}>
+              <Sparkles className="size-4" aria-hidden="true" />
               Generate exec recap
             </Button>
           ) : (
-            <Button variant="soft" icon={Edit3}>Edit event</Button>
+            <Button variant="outline">
+              <Edit3 className="size-4" aria-hidden="true" />
+              Edit event
+            </Button>
           )
         }
       />
 
       {/* Pipeline stage row */}
-      <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: 24 }}>
-        <span style={{
-          fontSize: 11, fontWeight: 600,
-          textTransform: 'uppercase', letterSpacing: '0.06em',
-          color: C.muted,
-        }}>
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           Stage
         </span>
         <Pill tone={stage.tone}>{stage.label}</Pill>
-        {event.managerNudgeSent && <Pill tone="neutral" icon={Send}>Manager nudge sent</Pill>}
+        {event.managerNudgeSent && (
+          <Pill tone="neutral" icon={Send}>Manager nudge sent</Pill>
+        )}
         {event.remoteFriendly && <Pill tone="neutral">Remote-friendly</Pill>}
         {event.vto && <Pill tone="terracotta">VTO eligible</Pill>}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-        {/* LEFT COLUMN */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
+        {/* LEFT */}
         <div className="flex flex-col gap-4">
-          {event.pipeline === 'at-risk' && event.diagnosis && (
-            <AtRiskDiagnosis diagnosis={event.diagnosis} options={event.options} />
+          {event.pipeline === "at-risk" && event.diagnosis && (
+            <AtRiskDiagnosis
+              diagnosis={event.diagnosis}
+              options={event.options}
+            />
           )}
 
           {showCommandCenter && <DayOfCommandCenter event={event} />}
@@ -103,7 +119,11 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
           <StageNote event={event} />
 
           {(isDone || event.registered > 0) && (
-            <AttendeesList attendees={attendees} event={event} isDone={isDone} />
+            <AttendeesList
+              attendees={attendees}
+              event={event}
+              isDone={isDone}
+            />
           )}
 
           {isDone && event.reconciliation && (
@@ -111,33 +131,25 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
           )}
 
           {isDone && event.outputs && (
-            <Card soft style={{ padding: 28 }}>
-              <h2 style={{
-                fontSize: 14, fontWeight: 600, color: C.ink,
-                marginBottom: 12, marginTop: 0,
-              }}>
+            <Card className="bg-muted/40 p-7">
+              <h2 className="mb-3 text-sm font-semibold text-foreground">
                 What we accomplished
               </h2>
-              <p style={{
-                fontFamily: 'var(--font-h1), sans-serif',
-                fontSize: 17, fontStyle: 'italic',
-                color: C.inkLight, lineHeight: 1.55,
-                margin: 0,
-              }}>
+              <p className="m-0 font-heading text-[17px] italic leading-relaxed text-muted-foreground">
                 {event.outputs}
               </p>
             </Card>
           )}
         </div>
 
-        {/* RIGHT SIDEBAR */}
+        {/* RIGHT */}
         <div className="flex flex-col gap-4">
           <EventDetailsCard event={event} isDone={isDone} stage={stage} />
           {event.partner && event.partnerId && (
             <PartnerLinkCard
               partner={event.partner}
               partnerId={event.partnerId}
-              router={router}
+              onClick={() => router.push(`/partners/${event.partnerId}`)}
             />
           )}
         </div>
@@ -147,7 +159,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
 }
 
 // ============================================================
-// SUB-COMPONENTS
+// AT-RISK DIAGNOSIS
 // ============================================================
 
 function AtRiskDiagnosis({
@@ -158,114 +170,79 @@ function AtRiskDiagnosis({
   options?: AtRiskOption[];
 }) {
   return (
-    <Card style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid var(--rose)` }}>
-      <div style={{ padding: '20px 28px', borderBottom: `1px solid ${C.border}` }}>
-        <div style={{
-          fontSize: 11, fontWeight: 700,
-          textTransform: 'uppercase', letterSpacing: '0.06em',
-          color: 'var(--rose-fg)', marginBottom: 4,
-        }}>
+    <Card className="overflow-hidden border-t-4 border-t-rose-500 p-0">
+      <div className="border-b border-border px-7 py-5">
+        <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-rose-700">
           Why this might be at risk
         </div>
-        <h2 style={{ fontSize: 15, fontWeight: 600, color: C.ink, margin: 0 }}>
+        <h2 className="text-[15px] font-semibold text-foreground">
           {diagnosis.length} candidate causes — your call which to act on
         </h2>
       </div>
 
-      <div style={{
-        padding: '20px 28px',
-        display: 'flex', flexDirection: 'column', gap: 14,
-      }}>
-        {diagnosis.map((d, i) => {
-          const confTone =
-            d.confidence === 'high'   ? { bg: 'var(--rose-bg)', color: 'var(--rose-fg)', border: 'var(--rose)' } :
-            d.confidence === 'medium' ? { bg: 'var(--amber-bg)', color: 'var(--amber-fg)', border: 'var(--amber)' } :
-            { bg: C.oat, color: C.inkLight, border: C.borderStrong };
-          return (
-            <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <span style={{
-                flexShrink: 0,
-                marginTop: 2,
-                padding: '2px 8px',
-                fontSize: 10,
-                fontWeight: 600,
-                borderRadius: 999,
-                background: confTone.bg,
-                color: confTone.color,
-                border: `1px solid ${confTone.border}`,
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-              }}>
-                {d.confidence}
-              </span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
-                  {d.cause}
-                </div>
-                <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.55 }}>
-                  {d.evidence}
-                </div>
+      <div className="flex flex-col gap-3.5 px-7 py-5">
+        {diagnosis.map((d, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <span
+              className={cn(
+                "mt-0.5 shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                d.confidence === "high" &&
+                  "border-rose-200 bg-rose-50 text-rose-900",
+                d.confidence === "medium" &&
+                  "border-amber-200 bg-amber-50 text-amber-900",
+                d.confidence !== "high" && d.confidence !== "medium" &&
+                  "border-border bg-muted text-muted-foreground",
+              )}
+            >
+              {d.confidence}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 text-[13px] font-semibold text-foreground">
+                {d.cause}
+              </div>
+              <div className="text-xs leading-relaxed text-muted-foreground">
+                {d.evidence}
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {options && options.length > 0 && (
-        <div style={{
-          padding: '20px 28px',
-          borderTop: `1px solid ${C.border}`,
-          background: C.oat,
-        }}>
-          <div style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, marginBottom: 12,
-          }}>
+        <div className="border-t border-border bg-muted/40 px-7 py-5">
+          <div className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Options on the table
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="flex flex-col gap-2.5">
             {options.map((opt, i) => {
               const tones = {
-                sage:  { dot: C.sage,    label: 'Cheapest move' },
-                amber: { dot: 'var(--amber)', label: 'Worth weighing' },
-                rose:  { dot: 'var(--rose)', label: 'Last resort' },
-              };
+                sage:  { dot: "bg-primary",     label: "Cheapest move" },
+                amber: { dot: "bg-amber-500",   label: "Worth weighing" },
+                rose:  { dot: "bg-rose-500",    label: "Last resort" },
+              } as const;
               const t = tones[opt.tone];
               return (
-                <div key={i} style={{
-                  display: 'flex',
-                  gap: 12,
-                  alignItems: 'flex-start',
-                  padding: 12,
-                  borderRadius: 10,
-                  background: C.paper,
-                  border: `1px solid ${C.border}`,
-                }}>
-                  <div
-                    style={{
-                      flexShrink: 0,
-                      marginTop: 5,
-                      width: 8, height: 8,
-                      borderRadius: '50%',
-                      background: t.dot,
-                    }}
+                <div
+                  key={i}
+                  className="flex items-start gap-3 rounded-md border border-border bg-card p-3"
+                >
+                  <span
                     aria-hidden="true"
+                    className={cn(
+                      "mt-1.5 size-2 shrink-0 rounded-full",
+                      t.dot,
+                    )}
                   />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="flex flex-wrap" style={{ justifyContent: 'space-between', marginBottom: 4, gap: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{opt.label}</div>
-                      <span style={{
-                        fontSize: 10,
-                        color: C.muted,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.06em',
-                        fontWeight: 600,
-                      }}>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex flex-wrap justify-between gap-2">
+                      <div className="text-[13px] font-semibold text-foreground">
+                        {opt.label}
+                      </div>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                         {t.label}
                       </span>
                     </div>
-                    <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.55 }}>
+                    <div className="text-xs leading-relaxed text-muted-foreground">
                       {opt.detail}
                     </div>
                   </div>
@@ -273,10 +250,7 @@ function AtRiskDiagnosis({
               );
             })}
           </div>
-          <p style={{
-            fontSize: 11, color: C.muted, lineHeight: 1.5,
-            margin: '12px 0 0', fontStyle: 'italic',
-          }}>
+          <p className="mt-3 text-[11px] italic leading-relaxed text-muted-foreground">
             AI surfaces the diagnosis. The decision is yours.
           </p>
         </div>
@@ -285,222 +259,206 @@ function AtRiskDiagnosis({
   );
 }
 
+// ============================================================
+// DAY-OF COMMAND CENTER
+// ============================================================
+
 function DayOfCommandCenter({ event }: { event: EventType }) {
   const checkedIn = Math.floor(event.registered * 0.62);
   return (
-    <Card style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid ${C.terracotta}` }}>
-      <div className="flex flex-wrap items-center justify-between gap-3" style={{
-        padding: '20px 28px',
-        borderBottom: `1px solid ${C.border}`,
-      }}>
+    <Card className="overflow-hidden border-t-4 border-t-primary p-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-7 py-5">
         <div>
-          <div style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.terracotta, marginBottom: 4,
-          }}>
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-primary">
             Day-of command center
           </div>
-          <h2 style={{ fontSize: 15, fontWeight: 600, color: C.ink, margin: 0 }}>
+          <h2 className="text-[15px] font-semibold text-foreground">
             Live operations
           </h2>
         </div>
-        <span style={{ fontSize: 11, color: C.muted, fontStyle: 'italic' }}>
+        <span className="text-[11px] italic text-muted-foreground">
           Updates every 30 sec
         </span>
       </div>
 
       {/* Live attendance variance */}
-      <div className="grid grid-cols-3 gap-4" style={{
-        padding: '20px 28px',
-        borderBottom: `1px solid ${C.border}`,
-      }}>
+      <div className="grid grid-cols-3 gap-4 border-b border-border px-7 py-5">
         {[
-          { label: 'Registered', value: String(event.registered), sub: 'Confirmed signups', tone: 'ink' as const },
-          { label: 'Checked in', value: String(checkedIn), sub: '62% of expected', tone: 'sage' as const },
-          { label: 'Variance', value: '−4', sub: 'Slightly below pace', tone: 'amber' as const },
-        ].map(m => (
+          { label: "Registered",  value: String(event.registered), sub: "Confirmed signups",     tone: "ink" as const },
+          { label: "Checked in",  value: String(checkedIn),         sub: "62% of expected",       tone: "sage" as const },
+          { label: "Variance",    value: "−4",                       sub: "Slightly below pace",   tone: "amber" as const },
+        ].map((m) => (
           <div key={m.label}>
-            <div style={{
-              fontSize: 10, fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.06em',
-              color: C.muted, marginBottom: 6,
-            }}>
+            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               {m.label}
             </div>
-            <div style={{
-              fontFamily: 'var(--font-h1), sans-serif',
-              fontSize: 32, lineHeight: 1,
-              color: m.tone === 'sage' ? C.sage : m.tone === 'amber' ? 'var(--amber-fg)' : C.ink,
-              marginBottom: 4,
-            }}>
+            <div
+              className={cn(
+                "mb-1 font-heading text-3xl leading-none",
+                m.tone === "sage" && "text-primary",
+                m.tone === "amber" && "text-amber-800",
+                m.tone === "ink" && "text-foreground",
+              )}
+            >
               {m.value}
             </div>
-            <div style={{ fontSize: 11, color: C.muted }}>{m.sub}</div>
+            <div className="text-[11px] text-muted-foreground">{m.sub}</div>
           </div>
         ))}
       </div>
 
-      {/* Two-column live ops: stack on narrow */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-2"
-        style={{ gap: 0 }}
-      >
-        <div
-          className="border-b md:border-b-0 md:border-r"
-          style={{
-            padding: '20px 24px 20px 28px',
-            borderColor: C.border,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-            <CheckCircle2 size={13} color={C.sage} aria-hidden="true" />
-            <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>
+      {/* Two-column live ops */}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="border-b border-border px-6 py-5 md:border-b-0 md:border-r md:pl-7">
+          <div className="mb-3 flex items-center gap-1.5">
+            <CheckCircle2
+              className="size-3.5 text-primary"
+              aria-hidden="true"
+            />
+            <span className="text-xs font-semibold text-foreground">
               Guest list synced
             </span>
           </div>
-          <div style={{ fontSize: 11, color: C.inkLight, lineHeight: 1.6, marginBottom: 12 }}>
-            Latest version sent to building security 6 minutes ago. 47 names match the live signup sheet.
+          <div className="mb-3 text-[11px] leading-relaxed text-muted-foreground">
+            Latest version sent to building security 6 minutes ago. 47 names
+            match the live signup sheet.
           </div>
           <button
-            className="view-btn"
-            style={{
-              fontSize: 11, color: C.terracotta, fontWeight: 600,
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              padding: 0,
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              fontFamily: 'inherit',
-            }}
+            type="button"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            Resend if list changed <ChevronRight size={11} aria-hidden="true" />
+            Resend if list changed <ChevronRight className="size-3" aria-hidden="true" />
           </button>
         </div>
 
-        <div style={{ padding: '20px 28px 20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-            <AlertCircle size={13} color="var(--amber)" aria-hidden="true" />
-            <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>Supply check</span>
+        <div className="px-6 py-5 md:pr-7">
+          <div className="mb-3 flex items-center gap-1.5">
+            <AlertCircle
+              className="size-3.5 text-amber-600"
+              aria-hidden="true"
+            />
+            <span className="text-xs font-semibold text-foreground">
+              Supply check
+            </span>
           </div>
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: 6,
-            fontSize: 11, color: C.inkLight,
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex flex-col gap-1.5 text-[11px] text-muted-foreground">
+            <div className="flex justify-between">
               <span>Boxes</span>
-              <span style={{ color: C.sage, fontWeight: 600 }}>✓ On site</span>
+              <span className="font-semibold text-primary">✓ On site</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="flex justify-between">
               <span>Aprons</span>
-              <span style={{ color: C.sage, fontWeight: 600 }}>✓ On site</span>
+              <span className="font-semibold text-primary">✓ On site</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="flex justify-between">
               <span>Backup task plan</span>
-              <span style={{ color: 'var(--amber-fg)', fontWeight: 600 }}>Drafted</span>
+              <span className="font-semibold text-amber-700">Drafted</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Captain assignments */}
-      <div style={{ padding: '20px 28px', borderTop: `1px solid ${C.border}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-          <Users size={13} color={C.muted} aria-hidden="true" />
-          <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>Team captains</span>
+      <div className="border-t border-border px-7 py-5">
+        <div className="mb-3 flex items-center gap-1.5">
+          <Users
+            className="size-3.5 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <span className="text-xs font-semibold text-foreground">
+            Team captains
+          </span>
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        <div className="flex flex-wrap gap-1.5">
           {[
-            { name: 'Marcus L.', role: 'Check-in' },
-            { name: 'Priya R.',  role: 'Stations' },
-            { name: 'Jenna P.',  role: 'Photos' },
-          ].map(c => (
-            <div key={c.name} style={{
-              padding: '6px 10px',
-              borderRadius: 999,
-              background: C.oat,
-              border: `1px solid ${C.border}`,
-              fontSize: 11,
-              color: C.inkLight,
-            }}>
-              <span style={{ fontWeight: 600, color: C.ink }}>{c.name}</span>
-              <span style={{ color: C.muted }}> · {c.role}</span>
+            { name: "Marcus L.", role: "Check-in" },
+            { name: "Priya R.",  role: "Stations" },
+            { name: "Jenna P.",  role: "Photos" },
+          ].map((c) => (
+            <div
+              key={c.name}
+              className="rounded-full border border-border bg-muted px-2.5 py-1.5 text-[11px] text-muted-foreground"
+            >
+              <span className="font-semibold text-foreground">{c.name}</span>
+              <span> · {c.role}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Incident log */}
-      <div className="flex flex-wrap items-center justify-between gap-2" style={{
-        padding: '14px 28px',
-        background: C.oat,
-        fontSize: 11,
-        color: C.muted,
-      }}>
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-muted/40 px-7 py-3.5 text-[11px] text-muted-foreground">
         <span>Incident log: 0 issues reported</span>
-        <span style={{ fontStyle: 'italic' }}>Tap to log a moment</span>
+        <span className="italic">Tap to log a moment</span>
       </div>
     </Card>
   );
 }
 
+// ============================================================
+// STAGE NOTE
+// ============================================================
+
 function StageNote({ event }: { event: EventType }) {
-  let eyebrow = '';
-  let note: string | undefined;
-  let accent: string = C.borderStrong;
-  let eyebrowColor: string = C.muted;
+  const config = (() => {
+    switch (event.pipeline) {
+      case "sourcing":
+        return {
+          eyebrow: "Sourcing brief",
+          note: event.sourceNote,
+          border: "border-t-border-strong",
+          eyebrowText: "text-muted-foreground",
+        };
+      case "vetting":
+        return {
+          eyebrow: "Awaiting partner",
+          note: event.awaitingPartner,
+          border: "border-t-amber-500",
+          eyebrowText: "text-amber-700",
+        };
+      case "proposed":
+        return {
+          eyebrow: "Awaiting approval",
+          note: event.awaitingApproval,
+          border: "border-t-amber-500",
+          eyebrowText: "text-amber-700",
+        };
+      case "confirmed":
+        return {
+          eyebrow: "Comms plan",
+          note: event.confirmedNote,
+          border: "border-t-primary",
+          eyebrowText: "text-primary",
+        };
+      default:
+        return null;
+    }
+  })();
 
-  switch (event.pipeline) {
-    case 'sourcing':
-      eyebrow = 'Sourcing brief';
-      note = event.sourceNote;
-      accent = C.borderStrong;
-      eyebrowColor = C.muted;
-      break;
-    case 'vetting':
-      eyebrow = 'Awaiting partner';
-      note = event.awaitingPartner;
-      accent = C.amber;
-      eyebrowColor = C.amber;
-      break;
-    case 'proposed':
-      eyebrow = 'Awaiting approval';
-      note = event.awaitingApproval;
-      accent = C.amber;
-      eyebrowColor = C.amber;
-      break;
-    case 'confirmed':
-      eyebrow = 'Comms plan';
-      note = event.confirmedNote;
-      accent = C.sageDeep;
-      eyebrowColor = C.sageDeep;
-      break;
-    default:
-      return null;
-  }
-
-  if (!note) return null;
+  if (!config || !config.note) return null;
 
   return (
-    <Card style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid ${accent}` }}>
-      <div style={{ padding: '20px 28px' }}>
-        <div style={{
-          fontSize: 11, fontWeight: 700,
-          textTransform: 'uppercase', letterSpacing: '0.06em',
-          color: eyebrowColor, marginBottom: 8,
-        }}>
-          {eyebrow}
+    <Card className={cn("overflow-hidden border-t-4 p-0", config.border)}>
+      <div className="px-7 py-5">
+        <div
+          className={cn(
+            "mb-2 text-[11px] font-bold uppercase tracking-wider",
+            config.eyebrowText,
+          )}
+        >
+          {config.eyebrow}
         </div>
-        <p style={{
-          fontFamily: 'var(--font-h1), sans-serif',
-          fontSize: 17, fontStyle: 'italic',
-          color: C.inkLight, lineHeight: 1.55,
-          margin: 0,
-        }}>
-          {note}
+        <p className="m-0 font-heading text-[17px] italic leading-relaxed text-muted-foreground">
+          {config.note}
         </p>
       </div>
     </Card>
   );
 }
+
+// ============================================================
+// ATTENDEES LIST
+// ============================================================
 
 function AttendeesList({
   attendees,
@@ -515,60 +473,55 @@ function AttendeesList({
     isDone && event.attended && event.attended > 5
       ? event.attended - 5
       : event.registered > 5
-      ? event.registered - 5
-      : 0;
+        ? event.registered - 5
+        : 0;
 
   return (
-    <Card style={{ padding: 28 }}>
-      <h2 style={{
-        fontSize: 14, fontWeight: 600, color: C.ink,
-        marginBottom: 20, marginTop: 0,
-      }}>
-        {isDone ? 'Who showed up · hours logged' : "Who's signed up"}
+    <Card className="p-7">
+      <h2 className="mb-5 text-sm font-semibold text-foreground">
+        {isDone ? "Who showed up · hours logged" : "Who's signed up"}
       </h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {attendees.map(a => (
+      <div className="flex flex-col gap-1">
+        {attendees.map((a) => (
           <div
             key={a.id}
-            className="flex flex-wrap items-center justify-between gap-3"
-            style={{ padding: 12, borderRadius: 12 }}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl px-3 py-3"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <div className="flex min-w-0 items-center gap-3">
               <div
-                style={{
-                  width: 36, height: 36, borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'white', fontSize: 11, fontWeight: 600,
-                  background: `linear-gradient(135deg, ${C.sage}, ${C.sageLight})`,
-                  flexShrink: 0,
-                }}
                 aria-hidden="true"
+                className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-[11px] font-semibold text-white"
               >
-                {a.name.split(' ').map(n => n[0]).join('')}
+                {a.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: C.ink }}>{a.name}</div>
-                <div style={{ fontSize: 11, color: C.muted }}>{a.dept}</div>
+                <div className="text-[13px] font-medium text-foreground">
+                  {a.name}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {a.dept}
+                </div>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {a.status === 'attended' && (
+            <div className="flex items-center gap-3">
+              {a.status === "attended" && (
                 <>
                   <Pill tone="sage" icon={Check}>Attended</Pill>
-                  <span style={{ fontSize: 12, width: 48, textAlign: 'right', color: C.inkLight }}>
+                  <span className="w-12 text-right text-xs text-muted-foreground">
                     {a.hrs}h
                   </span>
                 </>
               )}
-              {a.status === 'no_show' && <Pill tone="rose">Missed</Pill>}
-              {a.status === 'registered' && <Pill tone="sage">Confirmed</Pill>}
+              {a.status === "no_show" && <Pill tone="rose">Missed</Pill>}
+              {a.status === "registered" && <Pill tone="sage">Confirmed</Pill>}
             </div>
           </div>
         ))}
         {remainingCount > 0 && (
-          <div style={{
-            fontSize: 12, textAlign: 'center', paddingTop: 12, color: C.muted,
-          }}>
+          <div className="pt-3 text-center text-xs text-muted-foreground">
             + {remainingCount} more
           </div>
         )}
@@ -577,94 +530,77 @@ function AttendeesList({
   );
 }
 
-function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliation }) {
+// ============================================================
+// RECONCILIATION QUEUE
+// ============================================================
+
+function ReconciliationQueue({
+  reconciliation,
+}: {
+  reconciliation: Reconciliation;
+}) {
   const itemCount =
     (reconciliation.checkInGap?.length ?? 0) +
     (reconciliation.retroactiveHours?.length ?? 0) +
     (reconciliation.photoConsent?.length ?? 0);
 
   return (
-    <Card style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid ${C.terracotta}` }}>
-      <div className="flex flex-wrap items-center justify-between gap-3" style={{
-        padding: '20px 28px',
-        borderBottom: `1px solid ${C.border}`,
-      }}>
+    <Card className="overflow-hidden border-t-4 border-t-primary p-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-7 py-5">
         <div>
-          <div style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.terracotta, marginBottom: 4,
-          }}>
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-primary">
             Review queue
           </div>
-          <h2 style={{ fontSize: 15, fontWeight: 600, color: C.ink, margin: 0 }}>
+          <h2 className="text-[15px] font-semibold text-foreground">
             Reconcile before the recap
           </h2>
         </div>
-        <span style={{ fontSize: 11, color: C.muted, fontStyle: 'italic' }}>
+        <span className="text-[11px] italic text-muted-foreground">
           {itemCount} items
         </span>
       </div>
 
       {reconciliation.checkInGap && reconciliation.checkInGap.length > 0 && (
-        <div style={{ padding: '16px 28px', borderBottom: `1px solid ${C.border}` }}>
-          <div style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, marginBottom: 12,
-          }}>
+        <div className="border-b border-border px-7 py-4">
+          <div className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Signed up but no check-in scan ({reconciliation.checkInGap.length})
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="flex flex-col gap-2">
             {reconciliation.checkInGap.map((item, i) => (
               <div
                 key={i}
-                className="flex flex-wrap items-center justify-between gap-3"
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: 10,
-                  background: C.oat,
-                  border: `1px solid ${C.border}`,
-                }}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2"
               >
-                <div style={{
-                  display: 'flex', alignItems: 'center',
-                  gap: 10, minWidth: 0,
-                }}>
+                <div className="flex min-w-0 items-center gap-2.5">
                   <div
-                    style={{
-                      width: 28, height: 28, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'white', fontSize: 10, fontWeight: 600,
-                      background: `linear-gradient(135deg, ${C.muted}, ${C.mutedLight})`,
-                      flexShrink: 0,
-                    }}
                     aria-hidden="true"
+                    className="flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-500 to-slate-400 text-[10px] font-semibold text-white"
                   >
-                    {item.name.split(' ').map(n => n[0]).join('')}
+                    {item.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: C.ink }}>{item.name}</div>
-                    <div style={{ fontSize: 11, color: C.muted }}>{item.dept}</div>
+                    <div className="text-[13px] font-medium text-foreground">
+                      {item.name}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {item.dept}
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button className="view-btn" style={{
-                    padding: '5px 12px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-                    borderRadius: 999,
-                    background: C.sageGlow, color: C.sageDeep,
-                    border: `1px solid var(--accent)`,
-                    cursor: 'pointer',
-                  }}>
+                <div className="flex gap-1.5">
+                  <button
+                    type="button"
+                    className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary/15"
+                  >
                     Mark attended
                   </button>
-                  <button className="view-btn" style={{
-                    padding: '5px 12px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-                    borderRadius: 999,
-                    background: 'var(--rose-bg)', color: 'var(--rose-fg)',
-                    border: `1px solid var(--rose)`,
-                    cursor: 'pointer',
-                  }}>
+                  <button
+                    type="button"
+                    className="rounded-full border border-rose-500 bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-900 hover:bg-rose-100"
+                  >
                     No-show
                   </button>
                 </div>
@@ -674,92 +610,72 @@ function ReconciliationQueue({ reconciliation }: { reconciliation: Reconciliatio
         </div>
       )}
 
-      {reconciliation.retroactiveHours && reconciliation.retroactiveHours.length > 0 && (
-        <div style={{ padding: '16px 28px', borderBottom: `1px solid ${C.border}` }}>
-          <div style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, marginBottom: 12,
-          }}>
-            Retroactive hours requested ({reconciliation.retroactiveHours.length})
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {reconciliation.retroactiveHours.map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: 12,
-                  borderRadius: 10,
-                  background: C.paper,
-                  border: `1px solid ${C.border}`,
-                }}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2" style={{ marginBottom: 6 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{item.name}</span>
-                    <span style={{ fontSize: 11, color: C.muted }}>{item.dept}</span>
-                    <span style={{
-                      fontFamily: 'var(--font-h1), sans-serif',
-                      fontSize: 18, color: C.ink, marginLeft: 8,
-                    }}>
-                      {item.requested}
-                    </span>
+      {reconciliation.retroactiveHours &&
+        reconciliation.retroactiveHours.length > 0 && (
+          <div className="border-b border-border px-7 py-4">
+            <div className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Retroactive hours requested ({reconciliation.retroactiveHours.length})
+            </div>
+            <div className="flex flex-col gap-2.5">
+              {reconciliation.retroactiveHours.map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-md border border-border bg-card p-3"
+                >
+                  <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <span className="text-[13px] font-semibold text-foreground">
+                        {item.name}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {item.dept}
+                      </span>
+                      <span className="ml-1 font-heading text-lg text-foreground">
+                        {item.requested}
+                      </span>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-primary/15"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground hover:bg-accent"
+                      >
+                        Decline
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <button className="view-btn" style={{
-                      padding: '4px 10px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-                      borderRadius: 999,
-                      background: C.sageGlow, color: C.sageDeep,
-                      border: `1px solid var(--accent)`,
-                      cursor: 'pointer',
-                    }}>
-                      Approve
-                    </button>
-                    <button className="view-btn" style={{
-                      padding: '4px 10px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit',
-                      borderRadius: 999,
-                      background: C.oat, color: C.inkLight,
-                      border: `1px solid ${C.borderStrong}`,
-                      cursor: 'pointer',
-                    }}>
-                      Decline
-                    </button>
+                  <div className="text-xs leading-relaxed text-muted-foreground">
+                    {item.note}
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
-                  {item.note}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {reconciliation.photoConsent && reconciliation.photoConsent.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2" style={{
-          padding: '16px 28px',
-          background: C.oat,
-          fontSize: 12,
-          color: C.inkLight,
-        }}>
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-muted/40 px-7 py-4 text-xs text-muted-foreground">
           <span>{reconciliation.photoConsent[0].note}</span>
           <button
-            className="view-btn"
-            style={{
-              fontSize: 11, color: C.terracotta, fontWeight: 600,
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              padding: 4, borderRadius: 4,
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              fontFamily: 'inherit',
-            }}
+            type="button"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            Send consent reminder <ChevronRight size={11} aria-hidden="true" />
+            Send consent reminder <ChevronRight className="size-3" aria-hidden="true" />
           </button>
         </div>
       )}
     </Card>
   );
 }
+
+// ============================================================
+// EVENT DETAILS CARD
+// ============================================================
 
 function EventDetailsCard({
   event,
@@ -771,35 +687,37 @@ function EventDetailsCard({
   stage: ReturnType<typeof pipelineConfig>;
 }) {
   return (
-    <Card style={{ padding: 20 }}>
-      <h2 style={{
-        fontSize: 11, fontWeight: 700,
-        textTransform: 'uppercase', letterSpacing: '0.06em',
-        color: C.muted, marginBottom: 12, marginTop: 0,
-      }}>
+    <Card className="p-5">
+      <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         Event details
       </h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
+      <div className="flex flex-col gap-2.5 text-[13px]">
         <Row label="Stage">
           <Pill tone={stage.tone}>{stage.label}</Pill>
         </Row>
-        {event.capacity > 0 && <Row label="Capacity"><span style={{ color: C.ink }}>{event.capacity}</span></Row>}
+        {event.capacity > 0 && (
+          <Row label="Capacity">
+            <span className="text-foreground">{event.capacity}</span>
+          </Row>
+        )}
         {(event.registered > 0 || isDone) && (
-          <Row label={isDone ? 'Attended' : 'Registered'}>
-            <span style={{ color: C.ink }}>{event.attended ?? event.registered}</span>
+          <Row label={isDone ? "Attended" : "Registered"}>
+            <span className="text-foreground">
+              {event.attended ?? event.registered}
+            </span>
           </Row>
         )}
         {isDone && (
           <Row label="Hours">
-            <span style={{ color: C.ink }}>{event.hours}</span>
+            <span className="text-foreground">{event.hours}</span>
           </Row>
         )}
         <Row label="VTO">
-          <span style={{ color: C.ink }}>{event.vto ? 'Yes' : 'No'}</span>
+          <span className="text-foreground">{event.vto ? "Yes" : "No"}</span>
         </Row>
         {event.remoteFriendly && (
           <Row label="Remote">
-            <span style={{ color: C.ink }}>Friendly</span>
+            <span className="text-foreground">Friendly</span>
           </Row>
         )}
       </div>
@@ -807,15 +725,16 @@ function EventDetailsCard({
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      gap: 8,
-    }}>
-      <span style={{ color: C.muted }}>{label}</span>
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-muted-foreground">{label}</span>
       {children}
     </div>
   );
@@ -824,37 +743,27 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 function PartnerLinkCard({
   partner,
   partnerId,
-  router,
+  onClick,
 }: {
   partner: string;
   partnerId: string;
-  router: ReturnType<typeof useRouter>;
+  onClick: () => void;
 }) {
+  void partnerId;
   return (
-    <Card style={{ padding: 20 }}>
-      <h2 style={{
-        fontSize: 11, fontWeight: 700,
-        textTransform: 'uppercase', letterSpacing: '0.06em',
-        color: C.muted, marginBottom: 12, marginTop: 0,
-      }}>
+    <Card className="p-5">
+      <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         Partner
       </h2>
-      <div style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+      <div className="mb-1 text-[13px] font-semibold text-foreground">
         {partner}
       </div>
       <button
-        onClick={() => router.push(`/partners/${partnerId}`)}
-        className="view-btn"
-        style={{
-          fontSize: 11, color: C.muted,
-          background: 'transparent', border: 'none',
-          cursor: 'pointer', padding: 4, borderRadius: 4,
-          display: 'inline-flex', alignItems: 'center', gap: 4,
-          marginLeft: -4,
-          fontFamily: 'inherit',
-        }}
+        type="button"
+        onClick={onClick}
+        className="-ml-1 inline-flex items-center gap-1 rounded p-1 text-[11px] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        View partner profile <ChevronRight size={11} aria-hidden="true" />
+        View partner profile <ChevronRight className="size-3" aria-hidden="true" />
       </button>
     </Card>
   );

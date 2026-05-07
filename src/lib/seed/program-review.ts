@@ -18,7 +18,7 @@ export const PROGRAM_REVIEW: ProgramReview = {
     },
     {
       heading: 'Where we drifted',
-      body: 'Two patterns are worth naming honestly. First: the Animal Center has been quiet since November. Last contact six days ago is now closer to four months on the relationship clock. They will fall off the active list in Q2 if we do not reach out. Second: $8.4k of employee payroll giving has flowed to Maya\'s Family Center over the past 18 months, but we have never run a volunteer activation with them. That is a real demand signal we have not converted — and worth a conversation with their team about whether they actually want a volunteer event, or whether the giving relationship is the right shape on its own.',
+      body: 'Two patterns are worth naming honestly. First: the Animal Center has been quiet since November. Last contact six days ago is now closer to four months on the relationship clock. They will fall off the active list in Q2 without a check-in. Second: $8.4k of employee payroll giving has flowed to Maya\'s Family Center over the past 18 months, but we have never run a volunteer activation with them. That is a real demand signal we have not converted — and worth a conversation with their team about whether they actually want a volunteer event, or whether the giving relationship is the right shape on its own.',
     },
     {
       heading: 'Format mix this quarter',
@@ -31,7 +31,7 @@ export const PROGRAM_REVIEW: ProgramReview = {
     { label: 'Remote employees', detail: '34% of the remote workforce expressed interest in volunteering this year. Holiday drive pilot was promising. Worth a structured 2026 program.' },
   ],
   recommendations: [
-    { title: 'Reach out to Animal Center this week', body: 'Even a 15-minute call protects the relationship. They were a strong partner in Q3.' },
+    { title: 'Call Animal Center this week', body: 'Even a 15-minute call protects the relationship. They were a strong partner in Q3.' },
     { title: 'Open a Maya\'s Family Center conversation', body: 'Ask what shape of partnership they actually want. Could be giving alone is right — but ask, do not assume.' },
     { title: 'Surface a mental-health partner by mid-Q2', body: 'Demand signal is clear. Three candidates already shortlisted.' },
     { title: 'Pilot one skills-based engagement in Q2', body: 'Boys & Girls Club is the most natural opener.' },

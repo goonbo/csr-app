@@ -1,158 +1,137 @@
-import { Sparkles } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { Card } from '@/components/primitives/Card';
-import { DEMAND_SIGNALS } from '@/lib/seed/demand-signals';
+/**
+ * DemandSignalsPanel — what employees are signaling, before any partner
+ * is on the table. Per research, this is step 1 of the operator's
+ * actual cycle: signals come in (causes by strength, ERG asks,
+ * calendar moments, drift), then the operator plans against them.
+ *
+ * Used in the admin home workbench, between the attention queue and
+ * the pipeline strip.
+ */
 
-const trendIcon = (t: 'up' | 'steady' | 'emerging'): string =>
-  t === 'up' ? '↗' : t === 'emerging' ? '✦' : '→';
+import { Sparkles } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { DEMAND_SIGNALS } from "@/lib/seed/demand-signals";
+import { cn } from "@/lib/utils";
 
-const trendColor = (t: 'up' | 'steady' | 'emerging'): string =>
-  t === 'up' ? C.sage : t === 'emerging' ? C.terracotta : C.muted;
+const trendIcon = (t: "up" | "steady" | "emerging"): string =>
+  t === "up" ? "↗" : t === "emerging" ? "✦" : "→";
 
-// What employees are signaling, before any partner is on the table.
-// Per research: this is step 1 of the operator's actual cycle.
+const trendColorClass = (t: "up" | "steady" | "emerging"): string =>
+  t === "up"
+    ? "text-emerald-600"
+    : t === "emerging"
+      ? "text-orange-600"
+      : "text-muted-foreground";
+
 export function DemandSignalsPanel() {
   return (
-    <div style={{ marginBottom: 32 }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-      }}>
+    <section className="mb-8" data-slot="demand-signals">
+      <header className="mb-4 flex items-end justify-between gap-3">
         <div>
-          <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: 0 }}>
+          <h2 className="text-sm font-semibold text-foreground">
             What your people are signaling
           </h2>
-          <p style={{ fontSize: 12, color: C.muted, margin: '4px 0 0' }}>
+          <p className="mt-1 text-xs text-muted-foreground">
             What we&rsquo;re seeing this quarter, before you plan.
           </p>
         </div>
-        <span style={{ fontSize: 11, color: C.muted, fontStyle: 'italic' }}>
+        <span className="text-[11px] italic text-muted-foreground">
           Survey + giving + ERG asks · refreshed daily
         </span>
-      </div>
+      </header>
 
-      <Card style={{ padding: 0, overflow: 'hidden' }}>
+      <Card className="overflow-hidden gap-0 py-0">
         {/* Top: ranked causes */}
-        <div style={{ padding: '20px 28px' }}>
-          <div style={{
-            fontSize: 10, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, marginBottom: 14,
-          }}>
+        <div className="px-7 py-5">
+          <div className="mb-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             Causes by signal strength
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <ul className="flex flex-col gap-3.5">
             {DEMAND_SIGNALS.causes.map((c) => (
-              <div key={c.cause} style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-                <div style={{ flex: '0 0 140px', display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{
-                    fontFamily: 'var(--font-h1), sans-serif',
-                    fontSize: 22, color: C.ink, lineHeight: 1,
-                  }}>
+              <li
+                key={c.cause}
+                className="flex items-start gap-4"
+              >
+                <div className="flex shrink-0 basis-[140px] items-baseline gap-2">
+                  <span className="font-heading text-2xl leading-none text-foreground">
                     {c.strength}
                   </span>
-                  <span style={{ fontSize: 11, color: C.muted }}>%</span>
-                  <span style={{
-                    fontSize: 13,
-                    color: trendColor(c.trend),
-                    marginLeft: 4,
-                  }} aria-hidden="true">
+                  <span className="text-[11px] text-muted-foreground">%</span>
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "ml-1 text-sm",
+                      trendColorClass(c.trend),
+                    )}
+                  >
                     {trendIcon(c.trend)}
                   </span>
-                  <span style={{
-                    fontSize: 10, color: C.muted,
-                    textTransform: 'uppercase', letterSpacing: '0.06em',
-                    marginLeft: 2,
-                  }}>
+                  <span className="ml-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                     {c.trend}
                   </span>
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 text-[13px] font-semibold text-foreground">
                     {c.cause}
                   </div>
-                  <div style={{ fontSize: 11, color: C.inkLight, lineHeight: 1.55 }}>
-                    {c.sources.join(' · ')}
+                  <div className="text-[11px] leading-relaxed text-muted-foreground">
+                    {c.sources.join(" · ")}
                   </div>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
         {/* Mid: ERG asks + calendar moments */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-2"
-          style={{ borderTop: `1px solid ${C.border}` }}
-        >
-          <div
-            className="border-b md:border-b-0 md:border-r"
-            style={{
-              padding: '16px 24px 16px 28px',
-              borderColor: C.border,
-            }}
-          >
-            <div style={{
-              fontSize: 10, fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.06em',
-              color: C.muted, marginBottom: 10,
-            }}>
+        <div className="grid grid-cols-1 border-t border-border md:grid-cols-2">
+          <div className="border-b border-border px-6 py-4 md:border-b-0 md:border-r md:pl-7">
+            <div className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               ERG asks pending
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <ul className="flex flex-col gap-2">
               {DEMAND_SIGNALS.asks.map((a, i) => (
-                <div key={i} style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
-                  <span style={{ color: C.ink, fontWeight: 600 }}>{a.from}</span> · {a.what}
-                  <span style={{ color: C.muted, marginLeft: 6, fontStyle: 'italic' }}>{a.when}</span>
-                </div>
+                <li key={i} className="text-xs leading-relaxed text-foreground">
+                  <span className="font-semibold">{a.from}</span> · {a.what}
+                  <span className="ml-1.5 italic text-muted-foreground">
+                    {a.when}
+                  </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
-          <div style={{ padding: '16px 28px 16px 24px' }}>
-            <div style={{
-              fontSize: 10, fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.06em',
-              color: C.muted, marginBottom: 10,
-            }}>
+          <div className="px-6 py-4 md:pr-7">
+            <div className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               Moments coming up
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <ul className="flex flex-col gap-2">
               {DEMAND_SIGNALS.moments.map((m, i) => (
-                <div key={i} style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
-                  <span style={{ color: C.ink, fontWeight: 600 }}>{m.label}</span>
-                  <span style={{ color: C.muted, marginLeft: 6 }}>{m.when}</span>
-                  <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{m.note}</div>
-                </div>
+                <li key={i} className="text-xs leading-relaxed text-foreground">
+                  <span className="font-semibold">{m.label}</span>
+                  <span className="ml-1.5 text-muted-foreground">{m.when}</span>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">
+                    {m.note}
+                  </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
 
         {/* Bottom: drift signal — the most operator-critical insight */}
-        <div style={{
-          padding: '14px 28px',
-          background: C.terracottaGlow,
-          borderTop: `1px solid var(--accent)`,
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 10,
-        }}>
+        <div className="flex items-start gap-2.5 border-t border-primary/30 bg-primary/10 px-7 py-3.5">
           <Sparkles
-            size={13}
-            color={C.terracottaDeep}
             aria-hidden="true"
-            style={{ flexShrink: 0, marginTop: 2 }}
+            className="mt-0.5 size-3.5 shrink-0 text-primary"
           />
-          <div style={{ fontSize: 12, color: C.terracottaDeep, lineHeight: 1.55 }}>
-            <span style={{ fontWeight: 600 }}>
+          <p className="text-xs leading-relaxed text-primary">
+            <span className="font-semibold">
               Drift signal · {DEMAND_SIGNALS.drift.partner}.
-            </span>{' '}
+            </span>{" "}
             {DEMAND_SIGNALS.drift.note}
-          </div>
+          </p>
         </div>
       </Card>
-    </div>
+    </section>
   );
 }

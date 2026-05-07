@@ -1,13 +1,22 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { Sparkles, Send, ChevronRight, Download } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { PROGRAM_REVIEW } from '@/lib/seed/program-review';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { Pill } from '@/components/primitives/Pill';
-import { Button } from '@/components/primitives/Button';
+/**
+ * /reports — quarterly program review (Blueprint register).
+ *
+ * Editorial document. Wraps in `data-theme="blueprint"` so the H1
+ * picks up Fraunces and the surface goes mist-white. Read top-to-
+ * bottom: AI status banner, headline, by-the-numbers KPIs, plain
+ * summary, narrative sections, trends, recommendations. Sticky
+ * action bar at the bottom.
+ */
+
+import { useRouter } from "next/navigation";
+import { Sparkles, Send, ChevronRight, Download } from "lucide-react";
+import { PROGRAM_REVIEW } from "@/lib/seed/program-review";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Pill } from "@/components/view/Pill";
+import { PageHeader } from "@/components/view/PageHeader";
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -20,38 +29,28 @@ export default function ReportsPage() {
         title={r.quarter}
         subtitle="Prepared by Sarah Chen — narrative draft, ready for review."
         action={
-          <Button
-            variant="accent"
-            icon={Send}
-            onClick={() => router.push('/')}
-          >
+          <Button onClick={() => router.push("/")}>
+            <Send className="size-4" aria-hidden="true" />
             Send to leadership
           </Button>
         }
       />
 
-      <div style={{
-        maxWidth: 920,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}>
+      <div className="flex max-w-[920px] flex-col gap-4">
         {/* AI status banner */}
-        <Card ai style={{ padding: 16 }}>
+        <Card className="bg-view-source-muted/40 ring-view-source/30 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <div className="flex min-w-0 items-center gap-3">
               <div
-                style={{
-                  width: 28, height: 28, borderRadius: '50%', background: C.sage,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}
                 aria-hidden="true"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-view-source text-white"
               >
-                <Sparkles size={12} color="white" strokeWidth={2.2} />
+                <Sparkles className="size-3" />
               </div>
-              <span style={{ fontSize: 13, color: C.sageDeep, lineHeight: 1.5 }}>
-                <span style={{ fontWeight: 600 }}>Draft compiled from program data.</span>{' '}
+              <span className="text-[13px] leading-relaxed text-view-source-foreground">
+                <span className="font-semibold">
+                  Draft compiled from program data.
+                </span>{" "}
                 Numbers are calculated. The narrative is editable.
               </span>
             </div>
@@ -60,34 +59,21 @@ export default function ReportsPage() {
         </Card>
 
         {/* Headline — the quarter's punchline */}
-        <Card style={{ padding: 40 }}>
-          <div style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, marginBottom: 16,
-          }}>
+        <Card className="p-10">
+          <div className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             The shape of the quarter
           </div>
-          <p style={{
-            fontFamily: 'var(--font-h1), sans-serif',
-            fontSize: 30, lineHeight: 1.25,
-            color: C.ink, margin: 0,
-            letterSpacing: '-0.01em',
-          }}>
+          <p className="m-0 font-heading text-[30px] leading-tight tracking-tight text-foreground">
             {r.headline}
           </p>
         </Card>
 
         {/* By the numbers */}
-        <Card style={{ padding: 28 }}>
-          <h2 style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, margin: '0 0 20px',
-          }}>
+        <Card className="p-7">
+          <h2 className="mb-5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             By the numbers
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {r.numbers.map((n, i) => (
               <KpiBlock key={i} value={n.n} label={n.l} sub={n.sub} />
             ))}
@@ -95,57 +81,36 @@ export default function ReportsPage() {
         </Card>
 
         {/* Lead paragraph */}
-        <Card style={{ padding: 32 }}>
-          <h2 style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, margin: '0 0 16px',
-          }}>
+        <Card className="p-8">
+          <h2 className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             The summary, plain
           </h2>
-          <p style={{
-            fontFamily: 'var(--font-h1), sans-serif',
-            fontSize: 18, lineHeight: 1.6,
-            color: C.ink, margin: 0,
-          }}>
+          <p className="m-0 font-heading text-lg leading-relaxed text-foreground">
             {r.lead}
           </p>
         </Card>
 
         {/* Narrative sections */}
         {r.sections.map((s, i) => (
-          <Card key={i} style={{ padding: 32 }}>
-            <h2 style={{
-              fontSize: 16, fontWeight: 600, color: C.ink,
-              margin: '0 0 12px',
-            }}>
+          <Card key={i} className="p-8">
+            <h2 className="mb-3 text-base font-semibold text-foreground">
               {s.heading}
             </h2>
-            <p style={{
-              fontSize: 14, lineHeight: 1.7,
-              color: C.inkLight, margin: 0,
-            }}>
+            <p className="m-0 text-sm leading-relaxed text-muted-foreground">
               {s.body}
             </p>
           </Card>
         ))}
 
         {/* Trends */}
-        <Card style={{ padding: 32 }}>
-          <h2 style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, margin: '0 0 4px',
-          }}>
+        <Card className="p-8">
+          <h2 className="mb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Trends worth watching
           </h2>
-          <p style={{
-            fontSize: 12, color: C.muted, margin: '0 0 18px',
-            fontStyle: 'italic',
-          }}>
+          <p className="mb-4 text-xs italic text-muted-foreground">
             Where the demand signal is moving — what to scope next quarter.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             {r.trends.map((t, i) => (
               <TrendRow key={i} label={t.label} detail={t.detail} />
             ))}
@@ -153,21 +118,14 @@ export default function ReportsPage() {
         </Card>
 
         {/* Recommendations */}
-        <Card style={{ padding: 32 }}>
-          <h2 style={{
-            fontSize: 11, fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-            color: C.muted, margin: '0 0 4px',
-          }}>
+        <Card className="p-8">
+          <h2 className="mb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             What we recommend
           </h2>
-          <p style={{
-            fontSize: 12, color: C.muted, margin: '0 0 18px',
-            fontStyle: 'italic',
-          }}>
+          <p className="mb-4 text-xs italic text-muted-foreground">
             Concrete moves. Each one stands alone — pick the ones that fit.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="flex flex-col gap-3">
             {r.recommendations.map((rec, i) => (
               <RecommendationItem
                 key={i}
@@ -180,23 +138,18 @@ export default function ReportsPage() {
         </Card>
 
         {/* Sticky action bar */}
-        <div style={{ position: 'sticky', bottom: 16, marginTop: 16, zIndex: 10 }}>
-          <Card style={{
-            padding: 16,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-          }}>
+        <div className="sticky bottom-4 z-10 mt-4">
+          <Card className="p-4 shadow-lg">
             <div className="flex flex-wrap items-center gap-3">
-              <Button
-                variant="accent"
-                icon={Send}
-                onClick={() => router.push('/')}
-              >
+              <Button onClick={() => router.push("/")}>
+                <Send className="size-4" aria-hidden="true" />
                 Send to leadership
               </Button>
-              <Button variant="soft" icon={Download}>
+              <Button variant="outline">
+                <Download className="size-4" aria-hidden="true" />
                 Download PDF
               </Button>
-              <Button variant="ghost" onClick={() => router.push('/')}>
+              <Button variant="ghost" onClick={() => router.push("/")}>
                 Save draft
               </Button>
             </div>
@@ -207,50 +160,36 @@ export default function ReportsPage() {
   );
 }
 
-function KpiBlock({ value, label, sub }: { value: string; label: string; sub: string }) {
+function KpiBlock({
+  value,
+  label,
+  sub,
+}: {
+  value: string;
+  label: string;
+  sub: string;
+}) {
   return (
     <div>
-      <div style={{
-        fontFamily: 'var(--font-h1), sans-serif',
-        fontSize: 38, lineHeight: 1, color: C.ink,
-        fontVariantNumeric: 'tabular-nums',
-        marginBottom: 8,
-      }}>
+      <div className="mb-2 font-heading text-[38px] leading-none tabular-nums text-foreground">
         {value}
       </div>
-      <div style={{
-        fontSize: 12, fontWeight: 600,
-        color: C.ink, marginBottom: 2,
-      }}>
+      <div className="mb-0.5 text-xs font-semibold text-foreground">
         {label}
       </div>
-      <div style={{
-        fontSize: 11, color: C.muted, lineHeight: 1.4,
-      }}>
-        {sub}
-      </div>
+      <div className="text-[11px] leading-snug text-muted-foreground">{sub}</div>
     </div>
   );
 }
 
 function TrendRow({ label, detail }: { label: string; detail: string }) {
   return (
-    <div style={{
-      display: 'flex',
-      gap: 14,
-      paddingLeft: 14,
-      borderLeft: `2px solid ${C.borderStrong}`,
-    }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: 13, fontWeight: 600,
-          color: C.ink, marginBottom: 4,
-        }}>
+    <div className="flex gap-3.5 border-l-2 border-border-strong pl-3.5">
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 text-[13px] font-semibold text-foreground">
           {label}
         </div>
-        <div style={{
-          fontSize: 13, color: C.inkLight, lineHeight: 1.55,
-        }}>
+        <div className="text-[13px] leading-relaxed text-muted-foreground">
           {detail}
         </div>
       </div>
@@ -259,61 +198,33 @@ function TrendRow({ label, detail }: { label: string; detail: string }) {
 }
 
 function RecommendationItem({
-  index, title, body,
+  index,
+  title,
+  body,
 }: {
-  index: number; title: string; body: string;
+  index: number;
+  title: string;
+  body: string;
 }) {
   return (
-    <div style={{
-      display: 'flex',
-      gap: 14,
-      padding: 16,
-      borderRadius: 12,
-      background: C.paper,
-      borderTop: `1px solid ${C.border}`,
-      borderRight: `1px solid ${C.border}`,
-      borderBottom: `1px solid ${C.border}`,
-      borderLeft: `1px solid ${C.border}`,
-    }}>
+    <div className="flex gap-3.5 rounded-xl border border-border bg-card p-4">
       <div
         aria-hidden="true"
-        style={{
-          flexShrink: 0,
-          width: 28, height: 28, borderRadius: '50%',
-          background: C.sageGlow,
-          color: C.sageDeep,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 12, fontWeight: 700,
-          fontFamily: 'var(--font-h1), sans-serif',
-        }}
+        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-xs font-bold text-primary"
       >
         {index}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="flex flex-wrap items-center justify-between gap-2" style={{ marginBottom: 6 }}>
-          <h3 style={{
-            fontSize: 14, fontWeight: 600,
-            color: C.ink, margin: 0,
-          }}>
-            {title}
-          </h3>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="m-0 text-sm font-semibold text-foreground">{title}</h3>
           <button
-            className="view-btn"
-            style={{
-              fontSize: 11, color: C.muted,
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              padding: 4, borderRadius: 4,
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              fontFamily: 'inherit',
-            }}
+            type="button"
+            className="inline-flex items-center gap-1 rounded p-1 text-[11px] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            Add to plan <ChevronRight size={11} aria-hidden="true" />
+            Add to plan <ChevronRight className="size-3" aria-hidden="true" />
           </button>
         </div>
-        <p style={{
-          fontSize: 13, lineHeight: 1.55,
-          color: C.inkLight, margin: 0,
-        }}>
+        <p className="m-0 text-[13px] leading-relaxed text-muted-foreground">
           {body}
         </p>
       </div>

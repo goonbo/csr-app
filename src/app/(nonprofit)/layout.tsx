@@ -1,15 +1,12 @@
-import { TopNav } from '@/components/layout/TopNav';
+import { TopNav } from "@/components/view/TopNav";
 
 export default function NonprofitLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div data-theme="field" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div data-theme="field" className="min-h-screen bg-background text-foreground">
       <TopNav />
-      <main
-        className="px-4 sm:px-6 md:px-8 py-8 md:py-10"
-        style={{ maxWidth: 1280, margin: '0 auto' }}
-      >
+      <main className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6 md:px-8 md:py-10">
         {children}
       </main>
     </div>

@@ -1,190 +1,182 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Search, ArrowRight, Award } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { fmtDate } from '@/lib/format';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { ViewSourcePill } from '@/components/primitives/ViewSourcePill';
-import { NP_VOLUNTEERS } from '@/lib/seed/np-volunteers';
-import type { Volunteer, DataSource } from '@/lib/types';
+/**
+ * /np/volunteers — volunteer pool list (Field theme).
+ *
+ * PageHeader greets with the sub-line "Your pool" + count summary.
+ * Filter bar has two rows:
+ *   1. Search (InputGroup) + Status segmented control (All / Active /
+ *      Inactive). Status defaults to Active — corner-cuts the most
+ *      common view.
+ *   2. Source segmented control (All / Via VIEW partners / Direct /
+ *      Imported), each label suffixed with a count, and the Via
+ *      VIEW tab gets a small cyan dot affordance.
+ *
+ * The filtered+sorted list is a single Card containing row buttons:
+ *   avatar · name + ViewSourcePill/Imported pill/recognition/inactive
+ *   chips · employer · hours (mono, right-aligned) · last active ·
+ *   chevron. Sort: most-recent lastActive first.
+ *
+ * Sub-line "Showing X of Y" hangs below the list.
+ */
 
-type SourceFilter = 'all' | DataSource;
-type StatusFilter = 'all' | 'active' | 'inactive';
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Search, ArrowRight, Award } from "lucide-react";
+import { fmtDate } from "@/lib/format";
+import { NP_VOLUNTEERS } from "@/lib/seed/np-volunteers";
+import type { Volunteer, DataSource, RecognitionId } from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { PageHeader } from "@/components/view/PageHeader";
+import { ViewSourcePill } from "@/components/view/ViewSourcePill";
+import { cn } from "@/lib/utils";
+
+type SourceFilter = "all" | DataSource;
+type StatusFilter = "all" | "active" | "inactive";
 
 const SOURCE_FILTERS: { id: SourceFilter; label: string }[] = [
-  { id: 'all',          label: 'All sources' },
-  { id: 'view-partner', label: 'Via VIEW partners' },
-  { id: 'direct',       label: 'Direct signup' },
-  { id: 'imported',     label: 'Imported' },
+  { id: "all", label: "All sources" },
+  { id: "view-partner", label: "Via VIEW partners" },
+  { id: "direct", label: "Direct signup" },
+  { id: "imported", label: "Imported" },
 ];
 
 const STATUS_FILTERS: { id: StatusFilter; label: string }[] = [
-  { id: 'all',      label: 'All' },
-  { id: 'active',   label: 'Active' },
-  { id: 'inactive', label: 'Inactive' },
+  { id: "all", label: "All" },
+  { id: "active", label: "Active" },
+  { id: "inactive", label: "Inactive" },
 ];
 
 export default function VolunteersPage() {
   const router = useRouter();
-  const [source, setSource] = useState<SourceFilter>('all');
-  const [status, setStatus] = useState<StatusFilter>('active');
-  const [query, setQuery] = useState('');
+  const [source, setSource] = useState<SourceFilter>("all");
+  const [status, setStatus] = useState<StatusFilter>("active");
+  const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return NP_VOLUNTEERS.filter(v => {
-      if (source !== 'all' && v.source !== source) return false;
-      if (status !== 'all' && v.status !== status) return false;
-      if (q && !v.name.toLowerCase().includes(q) && !(v.employer ?? '').toLowerCase().includes(q)) return false;
+    return NP_VOLUNTEERS.filter((v) => {
+      if (source !== "all" && v.source !== source) return false;
+      if (status !== "all" && v.status !== status) return false;
+      if (
+        q &&
+        !v.name.toLowerCase().includes(q) &&
+        !(v.employer ?? "").toLowerCase().includes(q)
+      )
+        return false;
       return true;
     }).sort((a, b) => b.lastActive.localeCompare(a.lastActive));
   }, [source, status, query]);
 
-  const counts = useMemo(() => ({
-    all:           NP_VOLUNTEERS.length,
-    'view-partner': NP_VOLUNTEERS.filter(v => v.source === 'view-partner').length,
-    direct:         NP_VOLUNTEERS.filter(v => v.source === 'direct').length,
-    imported:       NP_VOLUNTEERS.filter(v => v.source === 'imported').length,
-  } as Record<SourceFilter, number>), []);
+  const sourceCounts = useMemo(
+    () =>
+      ({
+        all: NP_VOLUNTEERS.length,
+        "view-partner": NP_VOLUNTEERS.filter((v) => v.source === "view-partner")
+          .length,
+        direct: NP_VOLUNTEERS.filter((v) => v.source === "direct").length,
+        imported: NP_VOLUNTEERS.filter((v) => v.source === "imported").length,
+      }) as Record<SourceFilter, number>,
+    [],
+  );
+
+  const activeCount = NP_VOLUNTEERS.filter((v) => v.status === "active").length;
+  const employerCount = countDistinctEmployers(NP_VOLUNTEERS);
 
   return (
     <div>
       <PageHeader
         greeting="Your pool"
         title="Volunteers."
-        subtitle={`${NP_VOLUNTEERS.filter(v => v.status === 'active').length} active across ${countDistinctEmployers(NP_VOLUNTEERS)} employers — corporate-affiliated and community-direct.`}
+        subtitle={`${activeCount} active across ${employerCount} employers — corporate-affiliated and community-direct.`}
       />
 
-      {/* Filter bar */}
-      <div style={{
-        display: 'flex', flexDirection: 'column', gap: 12,
-        marginBottom: 20,
-      }}>
-        {/* Search + status row */}
+      <div className="mb-5 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            flex: 1, minWidth: 240, maxWidth: 420,
-            padding: '8px 12px',
-            background: C.paper, border: `1px solid ${C.border}`,
-            borderRadius: 'var(--radius)',
-          }}>
-            <Search size={14} color={C.muted} aria-hidden="true" />
-            <input
-              className="view-input"
+          <InputGroup className="h-9 max-w-[420px] flex-[1_1_240px]">
+            <InputGroupAddon>
+              <Search className="size-4" aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
               type="search"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by name or employer…"
-              style={{
-                flex: 1, fontSize: 13, fontFamily: 'inherit',
-                background: 'transparent', border: 'none',
-                color: C.ink, outline: 'none',
-              }}
+              aria-label="Search volunteers"
             />
-          </div>
-          <div role="group" aria-label="Status" style={{
-            display: 'flex', padding: 2,
-            borderRadius: 'var(--radius)',
-            background: C.oat, border: `1px solid ${C.border}`,
-          }}>
-            {STATUS_FILTERS.map(f => {
-              const active = status === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => setStatus(f.id)}
-                  aria-pressed={active}
-                  className="view-btn"
-                  style={{
-                    padding: '4px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
-                    color: active ? C.ink : C.muted,
-                    background: active ? C.paper : 'transparent',
-                    boxShadow: active ? '0 1px 2px rgba(10,26,46,0.06)' : 'none',
-                    border: 'none', cursor: 'pointer',
-                  }}
-                >
+          </InputGroup>
+
+          <Tabs
+            value={status}
+            onValueChange={(v) => setStatus(v as StatusFilter)}
+          >
+            <TabsList aria-label="Filter by status">
+              {STATUS_FILTERS.map((f) => (
+                <TabsTrigger key={f.id} value={f.id}>
                   {f.label}
-                </button>
-              );
-            })}
-          </div>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
 
-        {/* Source filter (the load-bearing one) */}
-        <div role="tablist" aria-label="Filter by source" style={{
-          display: 'flex', flexWrap: 'wrap', gap: 4,
-          padding: 4, borderRadius: 999,
-          background: C.oat, border: `1px solid ${C.border}`,
-          width: 'fit-content',
-        }}>
-          {SOURCE_FILTERS.map(f => {
-            const active = source === f.id;
-            return (
-              <button
+        <Tabs
+          value={source}
+          onValueChange={(v) => setSource(v as SourceFilter)}
+        >
+          <TabsList className="rounded-full" aria-label="Filter by source">
+            {SOURCE_FILTERS.map((f) => (
+              <TabsTrigger
                 key={f.id}
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSource(f.id)}
-                className="view-btn"
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: 999,
-                  fontSize: 13, fontWeight: 500, fontFamily: 'inherit',
-                  color: active ? C.ink : C.muted,
-                  background: active ? C.paper : 'transparent',
-                  boxShadow: active ? '0 1px 3px rgba(10,26,46,0.06)' : 'none',
-                  border: 'none', cursor: 'pointer',
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                }}
+                value={f.id}
+                className="rounded-full px-3"
               >
-                {f.id === 'view-partner' && (
-                  <span style={{
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: 'var(--view-source)',
-                  }} aria-hidden="true" />
+                {f.id === "view-partner" && (
+                  <span
+                    aria-hidden="true"
+                    className="size-1.5 shrink-0 rounded-full bg-view-source"
+                  />
                 )}
                 {f.label}
-                <span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>
-                  {counts[f.id]}
+                <span className="text-[11px] font-semibold text-muted-foreground">
+                  {sourceCounts[f.id]}
                 </span>
-              </button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
-      {/* List */}
       {filtered.length === 0 ? (
-        <Card style={{ padding: 32 }}>
-          <div style={{ fontSize: 14, color: C.inkLight }}>
+        <Card className="bg-muted/40 p-8">
+          <div className="text-sm text-foreground/70">
             No volunteers match this view. Try widening the filters.
           </div>
         </Card>
       ) : (
-        <Card style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {filtered.map((v, i) => (
-              <VolunteerRow
-                key={v.id}
-                volunteer={v}
-                isLast={i === filtered.length - 1}
-                onClick={() => router.push(`/np/volunteers/${v.id}`)}
-              />
-            ))}
-          </div>
+        <Card className="gap-0 p-0">
+          {filtered.map((v, i) => (
+            <VolunteerRow
+              key={v.id}
+              volunteer={v}
+              isLast={i === filtered.length - 1}
+              onClick={() => router.push(`/np/volunteers/${v.id}`)}
+            />
+          ))}
         </Card>
       )}
 
-      <div style={{
-        marginTop: 12, fontSize: 11, color: C.muted,
-        textAlign: 'right',
-      }}>
+      <div className="mt-3 text-right text-[11px] text-muted-foreground">
         Showing {filtered.length} of {NP_VOLUNTEERS.length}
       </div>
     </div>
@@ -203,124 +195,96 @@ interface VolunteerRowProps {
   onClick: () => void;
 }
 
-function VolunteerRow({ volunteer, isLast, onClick }: VolunteerRowProps) {
-  const v = volunteer;
+function VolunteerRow({ volunteer: v, isLast, onClick }: VolunteerRowProps) {
   const topRecognition = v.recognitions[v.recognitions.length - 1];
 
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="view-btn"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 140px 100px 36px',
-        gap: 16,
-        padding: '14px 18px',
-        background: 'transparent',
-        border: 'none',
-        borderBottom: isLast ? 'none' : `1px solid ${C.border}`,
-        cursor: 'pointer',
-        textAlign: 'left',
-        alignItems: 'center',
-        fontFamily: 'inherit',
-      }}
+      className={cn(
+        "grid grid-cols-[1fr_140px_100px_36px] items-center gap-4 px-4 py-3.5 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-[-2px]",
+        !isLast && "border-b border-border",
+      )}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+      <div className="flex min-w-0 items-center gap-3.5">
         <Avatar name={v.name} />
-        <div style={{ minWidth: 0 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            gap: 8, flexWrap: 'wrap', marginBottom: 2,
-          }}>
-            <span style={{ fontSize: 13.5, fontWeight: 600, color: C.ink }}>
+        <div className="min-w-0">
+          <div className="mb-0.5 flex flex-wrap items-center gap-2">
+            <span className="text-[13.5px] font-semibold text-foreground">
               {v.name}
             </span>
-            {v.source === 'view-partner' && v.employer && (
+            {v.source === "view-partner" && v.employer && (
               <ViewSourcePill partner={v.employer} size="sm" />
             )}
-            {v.source === 'imported' && (
-              <span style={{
-                fontSize: 10, fontWeight: 600,
-                padding: '1px 7px', borderRadius: 999,
-                color: C.muted, background: C.oat,
-                border: `1px solid ${C.border}`,
-                letterSpacing: '0.02em',
-              }}>
+            {v.source === "imported" && (
+              <span className="inline-flex items-center rounded-full border border-border bg-muted px-1.5 py-px text-[10px] font-semibold tracking-wide text-muted-foreground">
                 Imported
               </span>
             )}
             {topRecognition && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                fontSize: 10, fontWeight: 600,
-                padding: '1px 7px', borderRadius: 999,
-                color: 'var(--accent-deep)', background: C.sageGlow,
-                border: `1px solid ${C.sage}`,
-                letterSpacing: '0.02em',
-              }}>
-                <Award size={9} strokeWidth={2.4} aria-hidden="true" />
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-1.5 py-px text-[10px] font-semibold text-emerald-900">
+                <Award className="size-2.5" strokeWidth={2.4} aria-hidden="true" />
                 {recognitionLabel(topRecognition)}
               </span>
             )}
-            {v.status === 'inactive' && (
-              <span style={{
-                fontSize: 10, fontWeight: 600,
-                padding: '1px 7px', borderRadius: 999,
-                color: C.muted, background: 'transparent',
-                border: `1px solid ${C.borderStrong}`,
-                letterSpacing: '0.02em',
-              }}>
+            {v.status === "inactive" && (
+              <span className="inline-flex items-center rounded-full border border-border px-1.5 py-px text-[10px] font-semibold tracking-wide text-muted-foreground">
                 Inactive
               </span>
             )}
           </div>
-          <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.4 }}>
-            {v.employer ?? 'Community volunteer'} · {v.eventsAttended} events
+          <div className="text-xs leading-tight text-muted-foreground">
+            {v.employer ?? "Community volunteer"} · {v.eventsAttended} events
           </div>
         </div>
       </div>
-      <div style={{
-        fontFamily: 'var(--font-mono), monospace',
-        fontSize: 13, color: C.ink,
-        textAlign: 'right',
-        fontVariantNumeric: 'tabular-nums',
-      }}>
+      <div className="text-right font-mono text-[13px] tabular-nums text-foreground">
         {v.totalHours.toLocaleString()} hrs
       </div>
-      <div style={{ fontSize: 11, color: C.muted, textAlign: 'right' }}>
+      <div className="text-right text-[11px] text-muted-foreground">
         {fmtDate(v.lastActive, false)}
       </div>
-      <ArrowRight size={14} color={C.muted} aria-hidden="true" />
+      <ArrowRight
+        className="size-3.5 text-muted-foreground"
+        aria-hidden="true"
+      />
     </button>
   );
 }
 
 function Avatar({ name }: { name: string }) {
-  const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
   return (
     <div
-      style={{
-        width: 36, height: 36, borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `linear-gradient(135deg, var(--accent), var(--accent-deep))`,
-        color: C.paper, fontSize: 12, fontWeight: 700,
-        flexShrink: 0,
-      }}
       aria-hidden="true"
+      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-xs font-bold text-primary-foreground"
     >
       {initials}
     </div>
   );
 }
 
-function recognitionLabel(id: string): string {
+function recognitionLabel(id: RecognitionId): string {
   switch (id) {
-    case '10-events': return '10 events';
-    case '25-events': return '25 events';
-    case '50-events': return '50 events';
-    case 'first-skills-based': return 'First skills-based';
-    case 'spanish-speaker': return 'Spanish-speaker';
-    case 'recurring-donor': return 'Recurring donor';
-    default: return id;
+    case "10-events":
+      return "10 events";
+    case "25-events":
+      return "25 events";
+    case "50-events":
+      return "50 events";
+    case "first-skills-based":
+      return "First skills-based";
+    case "spanish-speaker":
+      return "Spanish-speaker";
+    case "recurring-donor":
+      return "Recurring donor";
+    default:
+      return id;
   }
 }

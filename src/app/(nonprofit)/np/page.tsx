@@ -1,111 +1,100 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
+/**
+ * /np — Maria's nonprofit workbench (Field theme).
+ *
+ * The whole route group wraps in `data-theme="field"` (set by the
+ * (nonprofit)/layout.tsx) — emerald primary, otherwise identical
+ * to Operator. The cyan ViewSourcePills mark every row that flowed
+ * in through a VIEW corporate partner; cyan reads as foreign here
+ * because emerald is the local accent.
+ */
+
+import { useRouter } from "next/navigation";
 import {
-  AlertCircle, Sparkles, Award, ArrowRight,
-  PackageCheck, ChevronRight,
-} from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { fmtDate } from '@/lib/format';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { Pill } from '@/components/primitives/Pill';
-import { ViewSourcePill } from '@/components/primitives/ViewSourcePill';
-import { NP_CORPORATE_PARTNERS } from '@/lib/seed/np-corporate-partners';
-import { NP_VOLUNTEERS } from '@/lib/seed/np-volunteers';
-import { NP_CASH_DONATIONS, NP_INKIND_DONATIONS } from '@/lib/seed/np-donations';
+  AlertCircle, Sparkles, Award, ArrowRight, PackageCheck, ChevronRight,
+} from "lucide-react";
+import { fmtDate } from "@/lib/format";
+import { NP_CORPORATE_PARTNERS } from "@/lib/seed/np-corporate-partners";
+import { NP_VOLUNTEERS } from "@/lib/seed/np-volunteers";
+import { NP_INKIND_DONATIONS, NP_CASH_DONATIONS } from "@/lib/seed/np-donations";
+import { Card } from "@/components/ui/card";
+import { Pill } from "@/components/view/Pill";
+import { PageHeader } from "@/components/view/PageHeader";
+import { ViewSourcePill } from "@/components/view/ViewSourcePill";
+import { cn } from "@/lib/utils";
 
-// Partner pipeline stages, framed from the nonprofit's perspective.
-// Mirrors the corporate-side pipeline structurally so the bidirectional
-// flow reads as "two sides of the same workflow."
 const PIPELINE_STAGES = [
-  { id: 'inquiring', label: 'Inquiring', tone: 'neutral'    as const },
-  { id: 'scoping',   label: 'Scoping',   tone: 'amber'      as const },
-  { id: 'confirmed', label: 'Confirmed', tone: 'sage'       as const },
-  { id: 'hosted',    label: 'Hosted',    tone: 'sage'       as const },
-  { id: 'recapped',  label: 'Recapped',  tone: 'neutral'    as const },
-];
+  { id: "inquiring", label: "Inquiring" },
+  { id: "scoping",   label: "Scoping" },
+  { id: "confirmed", label: "Confirmed" },
+  { id: "hosted",    label: "Hosted" },
+  { id: "recapped",  label: "Recapped" },
+] as const;
 
 export default function NonprofitHomePage() {
   const router = useRouter();
+
   // --- Attention queue ---
-  const partnersWithPending = NP_CORPORATE_PARTNERS.filter(p => p.pendingRequest);
-
-  // Reconciliation: corporate-side e3 had 3 unscanned signups (Daniel,
-  // Aisha, Roman). They show up here as "needs cross-check with VIEW
-  // partner check-in data."
+  const partnersWithPending = NP_CORPORATE_PARTNERS.filter((p) => p.pendingRequest);
   const reconciliationCount = 3;
-
-  // In-kind awaiting valuation (status === 'received')
-  const inkindToValue = NP_INKIND_DONATIONS.filter(d => d.status === 'received');
-
-  // Recognition triggers — Augusto Vega just hit 25 events (per seed).
-  const augusto = NP_VOLUNTEERS.find(v => v.id === 'nv-augusto-vega');
+  const inkindToValue = NP_INKIND_DONATIONS.filter((d) => d.status === "received");
+  const augusto = NP_VOLUNTEERS.find((v) => v.id === "nv-augusto-vega");
 
   const attentionCount =
     partnersWithPending.length +
-    1 + // reconciliation queue counts as one attention item
+    1 +
     inkindToValue.length +
     (augusto ? 1 : 0);
 
   // --- This month at a glance ---
-  const monthStart = new Date('2026-04-01');
-  const allCash = [...NP_CASH_DONATIONS];
-  const monthCash = allCash.filter(d => new Date(d.date) >= monthStart && d.amount > 0);
+  const monthStart = new Date("2026-04-01");
+  const monthCash = NP_CASH_DONATIONS.filter(
+    (d) => new Date(d.date) >= monthStart && d.amount > 0,
+  );
   const viewMatchThisMonth = monthCash
-    .filter(d => d.source === 'view-partner')
+    .filter((d) => d.source === "view-partner")
     .reduce((s, d) => s + d.amount, 0);
   const directThisMonth = monthCash
-    .filter(d => d.source !== 'view-partner')
+    .filter((d) => d.source !== "view-partner")
     .reduce((s, d) => s + d.amount, 0);
 
-  const monthEvents = NP_CORPORATE_PARTNERS.flatMap(p =>
-    p.history.filter(h => new Date(h.date) >= monthStart)
-      .map(h => ({ ...h, partner: p })),
+  const monthEvents = NP_CORPORATE_PARTNERS.flatMap((p) =>
+    p.history
+      .filter((h) => new Date(h.date) >= monthStart)
+      .map((h) => ({ ...h, partner: p })),
   );
   const hoursThisMonth = monthEvents.reduce((s, h) => s + h.hours, 0);
   const viewHoursThisMonth = monthEvents
-    .filter(h => h.partner.source === 'view-partner')
+    .filter((h) => h.partner.source === "view-partner")
     .reduce((s, h) => s + h.hours, 0);
   const activationsThisMonth = monthEvents.length;
 
-  const inkindThisMonth = NP_INKIND_DONATIONS.filter(d => new Date(d.receivedDate) >= monthStart);
-  const inkindThisMonthValue = inkindThisMonth.reduce((s, d) => s + d.estimatedValue, 0);
+  const inkindThisMonth = NP_INKIND_DONATIONS.filter(
+    (d) => new Date(d.receivedDate) >= monthStart,
+  );
+  const inkindThisMonthValue = inkindThisMonth.reduce(
+    (s, d) => s + d.estimatedValue,
+    0,
+  );
   const inkindViewValue = inkindThisMonth
-    .filter(d => d.source === 'view-partner')
+    .filter((d) => d.source === "view-partner")
     .reduce((s, d) => s + d.estimatedValue, 0);
 
   // --- Partner pipeline counts ---
   const pipelineCounts: Record<string, { count: number; partners: string[] }> = {
-    inquiring: {
-      count: 1,
-      partners: ['CloudMotion · Q3 Reading Buddies'],
-    },
-    scoping: {
-      count: 1,
-      partners: ['Bramble Health · weekday evenings'],
-    },
-    confirmed: {
-      count: 1,
-      partners: ['Travis Energy · May 10 Sort Shift'],
-    },
-    hosted: {
-      count: 2,
-      partners: ['CloudMotion · Apr 10', 'Travis Energy · Apr 2'],
-    },
-    recapped: {
-      count: 4,
-      partners: ['CloudMotion · Dec 12', 'Hill Country Bank · Mar 20', 'Bramble Health · Apr 5', 'Maverick Foods · Apr 15'],
-    },
+    inquiring: { count: 1, partners: ["CloudMotion · Q3 Reading Buddies"] },
+    scoping:   { count: 1, partners: ["Bramble Health · weekday evenings"] },
+    confirmed: { count: 1, partners: ["Travis Energy · May 10 Sort Shift"] },
+    hosted:    { count: 2, partners: ["CloudMotion · Apr 10", "Travis Energy · Apr 2"] },
+    recapped:  { count: 4, partners: ["CloudMotion · Dec 12", "Hill Country Bank · Mar 20", "Bramble Health · Apr 5", "Maverick Foods · Apr 15"] },
   };
 
-  // --- Volunteer pulse: most recently active, top 6 ---
   const recentlyActive = [...NP_VOLUNTEERS]
     .sort((a, b) => b.lastActive.localeCompare(a.lastActive))
     .slice(0, 6);
 
-  // --- Drift signal: Cardinal Logistics ---
-  const cardinal = NP_CORPORATE_PARTNERS.find(p => p.id === 'cp-cardinal');
+  const cardinal = NP_CORPORATE_PARTNERS.find((p) => p.id === "cp-cardinal");
 
   return (
     <div>
@@ -116,56 +105,44 @@ export default function NonprofitHomePage() {
       />
 
       {/* WHAT NEEDS YOU TODAY */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', marginBottom: 16,
-        }}>
-          <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: 0 }}>
+      <section className="mb-8">
+        <header className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground">
             What needs you today
           </h2>
-          <span style={{
-            fontSize: 11, color: C.muted, fontWeight: 600,
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-          }}>
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {attentionCount} items
           </span>
-        </div>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {/* Pending requests */}
-          {partnersWithPending.map(p => {
+          {partnersWithPending.map((p) => {
             const r = p.pendingRequest!;
             return (
               <Card
                 key={`pending-${p.id}`}
-                ai
+                role="button"
+                tabIndex={0}
                 onClick={() => router.push(`/np/partners/${p.id}`)}
-                style={{ padding: 18 }}
+                className="bg-view-source-muted/40 ring-view-source/30 cursor-pointer p-4 transition-shadow hover:ring-view-source/50"
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div className="flex items-start gap-3">
                   <div
-                    style={{
-                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                      background: C.sageGlow,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
                     aria-hidden="true"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700"
                   >
-                    <Sparkles size={14} color="var(--accent-deep)" strokeWidth={2.4} />
+                    <Sparkles className="size-3.5" strokeWidth={2.4} />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      marginBottom: 4, flexWrap: 'wrap',
-                    }}>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
                       <Pill tone="sage">New proposal</Pill>
                       <ViewSourcePill partner={p.name} size="sm" />
                     </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+                    <div className="mb-1 text-sm font-semibold text-foreground">
                       {p.name} proposes {r.proposedTitle}
                     </div>
-                    <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
+                    <div className="text-xs leading-relaxed text-muted-foreground">
                       {fmtDate(r.proposedDate)} · {r.proposedTime} · {r.proposedCapacity} ppl
                     </div>
                   </div>
@@ -176,32 +153,27 @@ export default function NonprofitHomePage() {
 
           {/* Reconciliation queue */}
           <Card
-            onClick={() => router.push('/np/volunteers')}
-            style={{ padding: 18, borderLeft: `3px solid var(--amber)` }}
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push("/np/volunteers")}
+            className="cursor-pointer border-l-4 border-l-amber-500 p-4 transition-shadow hover:ring-foreground/15"
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+            <div className="flex items-start gap-3">
               <div
-                style={{
-                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                  background: 'var(--amber-bg)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
                 aria-hidden="true"
+                className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700"
               >
-                <AlertCircle size={14} color="var(--amber-fg)" strokeWidth={2.4} />
+                <AlertCircle className="size-3.5" strokeWidth={2.4} />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  marginBottom: 4, flexWrap: 'wrap',
-                }}>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex flex-wrap items-center gap-2">
                   <Pill tone="amber">Reconciliation</Pill>
                   <ViewSourcePill partner="CloudMotion" size="sm" />
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+                <div className="mb-1 text-sm font-semibold text-foreground">
                   {reconciliationCount} CloudMotion volunteers signed up, no scan
                 </div>
-                <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
+                <div className="text-xs leading-relaxed text-muted-foreground">
                   Daniel, Aisha, and Roman from the Apr 10 sort shift. Cross-check with VIEW check-in data.
                 </div>
               </div>
@@ -209,36 +181,34 @@ export default function NonprofitHomePage() {
           </Card>
 
           {/* In-kind to value */}
-          {inkindToValue.slice(0, 1).map(d => (
+          {inkindToValue.slice(0, 1).map((d) => (
             <Card
               key={`ik-${d.id}`}
-              onClick={() => router.push('/np/donations')}
-              style={{ padding: 18 }}
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push("/np/donations")}
+              className="cursor-pointer p-4 transition-shadow hover:ring-foreground/15"
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div className="flex items-start gap-3">
                 <div
-                  style={{
-                    width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    background: C.oat,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
                   aria-hidden="true"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
                 >
-                  <PackageCheck size={14} color={C.muted} strokeWidth={2.4} />
+                  <PackageCheck className="size-3.5" strokeWidth={2.4} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    marginBottom: 4, flexWrap: 'wrap',
-                  }}>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
                     <Pill tone="neutral">Receipt to issue</Pill>
-                    {d.source === 'view-partner' && <ViewSourcePill partner={d.donorName.split(' · ')[0]} size="sm" />}
+                    {d.source === "view-partner" && (
+                      <ViewSourcePill partner={d.donorName.split(" · ")[0]} size="sm" />
+                    )}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+                  <div className="mb-1 text-sm font-semibold text-foreground">
                     {d.description}
                   </div>
-                  <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
-                    {d.donorName} · ${d.estimatedValue.toLocaleString()} estimated value · received {fmtDate(d.receivedDate, false)}
+                  <div className="text-xs leading-relaxed text-muted-foreground">
+                    {d.donorName} · ${d.estimatedValue.toLocaleString()} estimated value · received{" "}
+                    {fmtDate(d.receivedDate, false)}
                   </div>
                 </div>
               </div>
@@ -248,31 +218,26 @@ export default function NonprofitHomePage() {
           {/* Recognition milestone */}
           {augusto && (
             <Card
+              role="button"
+              tabIndex={0}
               onClick={() => router.push(`/np/volunteers/${augusto.id}`)}
-              style={{ padding: 18 }}
+              className="cursor-pointer p-4 transition-shadow hover:ring-foreground/15"
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div className="flex items-start gap-3">
                 <div
-                  style={{
-                    width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    background: C.sageGlow,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
                   aria-hidden="true"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700"
                 >
-                  <Award size={14} color="var(--accent-deep)" strokeWidth={2.4} />
+                  <Award className="size-3.5" strokeWidth={2.4} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    marginBottom: 4, flexWrap: 'wrap',
-                  }}>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
                     <Pill tone="sage">Recognition</Pill>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+                  <div className="mb-1 text-sm font-semibold text-foreground">
                     Augusto Vega just passed 25 events
                   </div>
-                  <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.5 }}>
+                  <div className="text-xs leading-relaxed text-muted-foreground">
                     Quarterly recognition mailer goes out Friday. Hand-write this one.
                   </div>
                 </div>
@@ -280,14 +245,14 @@ export default function NonprofitHomePage() {
             </Card>
           )}
         </div>
-      </div>
+      </section>
 
       {/* THIS MONTH AT A GLANCE */}
-      <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: '0 0 16px' }}>
+      <section className="mb-8">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">
           This month at a glance
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <KpiCard
             label="Hours hosted"
             value={hoursThisMonth.toLocaleString()}
@@ -308,110 +273,93 @@ export default function NonprofitHomePage() {
             split={{ via: inkindViewValue, direct: inkindThisMonthValue - inkindViewValue }}
           />
         </div>
-        <div style={{
-          marginTop: 12, fontSize: 11, color: C.muted,
-          display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
-        }}>
-          <span>Cash this month: <strong style={{ color: C.ink, fontFamily: 'var(--font-mono)' }}>${(viewMatchThisMonth + directThisMonth).toLocaleString()}</strong></span>
+        <div className="mt-3 flex flex-wrap items-center gap-3.5 text-[11px] text-muted-foreground">
+          <span>
+            Cash this month:{" "}
+            <strong className="font-mono font-semibold text-foreground">
+              ${(viewMatchThisMonth + directThisMonth).toLocaleString()}
+            </strong>
+          </span>
           <span>·</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <span style={{
-              width: 8, height: 8, borderRadius: '50%',
-              background: 'var(--view-source)',
-            }} aria-hidden="true" />
+          <span className="inline-flex items-center gap-1">
+            <span aria-hidden="true" className="size-2 rounded-full bg-view-source" />
             <span>${viewMatchThisMonth.toLocaleString()} via VIEW match</span>
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <span style={{
-              width: 8, height: 8, borderRadius: '50%',
-              background: 'var(--accent)',
-            }} aria-hidden="true" />
+          <span className="inline-flex items-center gap-1">
+            <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
             <span>${directThisMonth.toLocaleString()} direct</span>
           </span>
         </div>
-      </div>
+      </section>
 
       {/* CORPORATE PARTNER PIPELINE */}
-      <div style={{ marginBottom: 32 }}>
-        <div className="flex flex-wrap items-end justify-between gap-3" style={{ marginBottom: 16 }}>
+      <section className="mb-8">
+        <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: 0 }}>
+            <h2 className="text-sm font-semibold text-foreground">
               Corporate partner pipeline
             </h2>
-            <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
+            <div className="mt-1 text-xs text-muted-foreground">
               Where the relationships stand right now.
             </div>
           </div>
           <button
-            onClick={() => router.push('/np/partners')}
-            className="view-btn"
-            style={{
-              fontSize: 12, color: C.muted,
-              background: 'transparent', border: 'none',
-              cursor: 'pointer', padding: 4, borderRadius: 4,
-              fontFamily: 'inherit',
-            }}
+            type="button"
+            onClick={() => router.push("/np/partners")}
+            className="rounded p-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             See all partners →
           </button>
-        </div>
+        </header>
 
-        <Card style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="overflow-x-auto" style={{ scrollbarWidth: 'thin' }}>
-            <div style={{ minWidth: 880, padding: '20px 16px' }}>
-              <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
+        <Card className="overflow-hidden p-0">
+          <div className="overflow-x-auto">
+            <div className="min-w-[880px] px-4 py-5">
+              <div className="flex items-stretch">
                 {PIPELINE_STAGES.map((stage, i) => {
                   const data = pipelineCounts[stage.id];
                   const isLast = i === PIPELINE_STAGES.length - 1;
+                  const filled = data.count > 0;
                   return (
-                    <div key={stage.id} style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'stretch',
-                    }}>
-                      <div style={{
-                        flex: 1, minWidth: 144,
-                        padding: '14px 14px',
-                        borderRadius: 'var(--radius)',
-                        background: data.count > 0 ? C.sageGlow : C.oat,
-                        opacity: data.count > 0 ? 1 : 0.6,
-                        position: 'relative',
-                      }}>
-                        <div style={{
-                          fontSize: 10, fontWeight: 700,
-                          textTransform: 'uppercase', letterSpacing: '0.06em',
-                          color: data.count > 0 ? 'var(--accent-deep)' : C.muted,
-                          marginBottom: 8,
-                        }}>
+                    <div key={stage.id} className="flex flex-1 items-stretch">
+                      <div
+                        className={cn(
+                          "relative flex-1 rounded-md p-3.5 min-w-[144px]",
+                          filled ? "bg-emerald-50" : "bg-muted opacity-60",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "mb-2 text-[10px] font-bold uppercase tracking-wider",
+                            filled ? "text-emerald-800" : "text-muted-foreground",
+                          )}
+                        >
                           {stage.label}
                         </div>
-                        <div style={{
-                          fontFamily: 'var(--font-h1), sans-serif',
-                          fontSize: 30, lineHeight: 1, fontWeight: 600,
-                          color: data.count > 0 ? 'var(--accent-deep)' : C.muted,
-                          marginBottom: 8,
-                          fontVariantNumeric: 'tabular-nums',
-                        }}>
+                        <div
+                          className={cn(
+                            "mb-2 font-heading text-3xl font-semibold leading-none tabular-nums",
+                            filled ? "text-emerald-800" : "text-muted-foreground",
+                          )}
+                        >
                           {data.count}
                         </div>
-                        <div style={{
-                          fontSize: 10.5,
-                          color: data.count > 0 ? 'var(--accent-deep)' : C.muted,
-                          lineHeight: 1.4,
-                          opacity: 0.85,
-                          minHeight: 26,
-                        }}>
-                          {data.partners.length > 0 ? data.partners[0] : 'empty'}
+                        <div
+                          className={cn(
+                            "min-h-[26px] text-[10.5px] leading-relaxed opacity-85",
+                            filled ? "text-emerald-800" : "text-muted-foreground",
+                          )}
+                        >
+                          {data.partners.length > 0 ? data.partners[0] : "empty"}
                           {data.partners.length > 1 && ` +${data.partners.length - 1}`}
                         </div>
                       </div>
                       {!isLast && (
-                        <div style={{
-                          display: 'flex', alignItems: 'center',
-                          flexShrink: 0, color: C.borderStrong,
-                          padding: '0 4px',
-                        }} aria-hidden="true">
-                          <ChevronRight size={14} strokeWidth={2.2} />
+                        <div
+                          aria-hidden="true"
+                          className="flex shrink-0 items-center px-1 text-border-strong"
+                        >
+                          <ChevronRight className="size-3.5" strokeWidth={2.2} />
                         </div>
                       )}
                     </div>
@@ -421,119 +369,105 @@ export default function NonprofitHomePage() {
             </div>
           </div>
         </Card>
-      </div>
+      </section>
 
-      {/* VOLUNTEER PULSE — last 7 days */}
-      <div style={{ marginBottom: 32 }}>
-        <div className="flex items-end justify-between" style={{ marginBottom: 16 }}>
+      {/* VOLUNTEER PULSE */}
+      <section className="mb-8">
+        <header className="mb-4 flex items-end justify-between">
           <div>
-            <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: 0 }}>
+            <h2 className="text-sm font-semibold text-foreground">
               Volunteer pulse
             </h2>
-            <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
-              Most recent activity · {NP_VOLUNTEERS.filter(v => v.status === 'active').length} active in pool
+            <div className="mt-1 text-xs text-muted-foreground">
+              Most recent activity ·{" "}
+              {NP_VOLUNTEERS.filter((v) => v.status === "active").length} active
+              in pool
             </div>
           </div>
           <button
-            onClick={() => router.push('/np/volunteers')}
-            className="view-btn"
-            style={{
-              fontSize: 12, color: C.muted,
-              background: 'transparent', border: 'none',
-              cursor: 'pointer', padding: 4, borderRadius: 4,
-              fontFamily: 'inherit',
-            }}
+            type="button"
+            onClick={() => router.push("/np/volunteers")}
+            className="rounded p-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             See all volunteers →
           </button>
-        </div>
+        </header>
 
-        <Card style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Card className="overflow-hidden p-0">
+          <div className="flex flex-col">
             {recentlyActive.map((v, i) => {
               const isLast = i === recentlyActive.length - 1;
               return (
                 <button
                   key={v.id}
+                  type="button"
                   onClick={() => router.push(`/np/volunteers/${v.id}`)}
-                  className="view-btn"
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 200px auto',
-                    gap: 16,
-                    padding: '12px 18px',
-                    fontFamily: 'inherit',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: isLast ? 'none' : `1px solid ${C.border}`,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    alignItems: 'center',
-                  }}
+                  className={cn(
+                    "grid items-center gap-4 px-5 py-3 text-left transition-colors hover:bg-muted/40",
+                    "grid-cols-[1fr_200px_auto]",
+                    !isLast && "border-b border-border",
+                  )}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                  <div className="flex min-w-0 items-center gap-3">
                     <Avatar name={v.name} />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{v.name}</span>
-                        {v.source === 'view-partner' && v.employer && (
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[13px] font-semibold text-foreground">
+                          {v.name}
+                        </span>
+                        {v.source === "view-partner" && v.employer && (
                           <ViewSourcePill partner={v.employer} size="sm" />
                         )}
                       </div>
-                      <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>
-                        {v.employer ?? 'Community volunteer'} · {v.totalHours} hrs total
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        {v.employer ?? "Community volunteer"} · {v.totalHours}{" "}
+                        hrs total
                       </div>
                     </div>
                   </div>
-                  <div style={{ fontSize: 11, color: C.muted, fontFamily: 'var(--font-mono)' }}>
+                  <div className="font-mono text-[11px] text-muted-foreground">
                     last active {fmtDate(v.lastActive, false)}
                   </div>
-                  <ArrowRight size={14} color={C.muted} aria-hidden="true" />
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-3.5 text-muted-foreground"
+                  />
                 </button>
               );
             })}
           </div>
         </Card>
-      </div>
+      </section>
 
-      {/* DRIFT SIGNAL — Cardinal Logistics */}
+      {/* DRIFT SIGNAL */}
       {cardinal && (
         <Card
+          role="button"
+          tabIndex={0}
           onClick={() => router.push(`/np/partners/${cardinal.id}`)}
-          style={{
-            padding: 18,
-            borderLeft: `3px solid var(--amber)`,
-            background: C.oat,
-          }}
+          className="cursor-pointer border-l-4 border-l-amber-500 bg-muted/40 p-4 transition-shadow hover:ring-foreground/15"
         >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-              background: 'var(--amber-bg)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }} aria-hidden="true">
-              <Sparkles size={14} color="var(--amber-fg)" strokeWidth={2.4} />
+          <div className="flex items-start gap-3">
+            <div
+              aria-hidden="true"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700"
+            >
+              <Sparkles className="size-3.5" strokeWidth={2.4} />
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                marginBottom: 4, flexWrap: 'wrap',
-              }}>
-                <span style={{
-                  fontSize: 10, fontWeight: 700,
-                  letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: 'var(--amber-fg)',
-                }}>
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
                   Drift signal
                 </span>
                 <ViewSourcePill partner="Cardinal Logistics" size="sm" />
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 4 }}>
+              <div className="mb-1 text-sm font-semibold text-foreground">
                 Cardinal Logistics has scheduled three events with us this year — but never asked about our IT volunteer needs.
               </div>
-              <div style={{ fontSize: 12, color: C.inkLight, lineHeight: 1.55 }}>
-                Renée mentioned at the August picnic that her ops team had bandwidth. The conversation has been
-                quiet since November. Worth a check-in before the relationship cools further.
+              <div className="text-xs leading-relaxed text-muted-foreground">
+                Renée mentioned at the August picnic that her ops team had bandwidth.
+                The conversation has been quiet since November. Worth a check-in
+                before the relationship cools further.
               </div>
             </div>
           </div>
@@ -542,10 +476,6 @@ export default function NonprofitHomePage() {
     </div>
   );
 }
-
-// ============================================================
-// Sub-components
-// ============================================================
 
 interface KpiCardProps {
   label: string;
@@ -560,49 +490,28 @@ function KpiCard({ label, value, unit, sublabel, split }: KpiCardProps) {
   const viaPct = total > 0 ? (split!.via / total) * 100 : 0;
 
   return (
-    <Card style={{ padding: 18 }}>
-      <div style={{
-        fontSize: 10.5, color: C.muted,
-        letterSpacing: '0.06em', textTransform: 'uppercase',
-        fontWeight: 600, marginBottom: 6,
-      }}>
+    <Card className="p-5">
+      <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </div>
-      <div style={{
-        fontFamily: 'var(--font-h1), sans-serif',
-        fontSize: 32, fontWeight: 600, color: C.ink,
-        letterSpacing: '-0.02em',
-        fontVariantNumeric: 'tabular-nums',
-        display: 'flex', alignItems: 'baseline', gap: 4,
-      }}>
+      <div className="flex items-baseline gap-1 font-heading text-3xl font-semibold leading-none tracking-tight tabular-nums text-foreground">
         {value}
         {unit && (
-          <span style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 13, fontWeight: 500, color: C.muted,
-          }}>{unit}</span>
+          <span className="font-sans text-[13px] font-medium text-muted-foreground">
+            {unit}
+          </span>
         )}
       </div>
       {split && total > 0 && (
-        <div style={{
-          marginTop: 10, height: 4,
-          borderRadius: 999, background: C.oat,
-          overflow: 'hidden', display: 'flex',
-        }} aria-hidden="true">
-          <div style={{
-            width: `${viaPct}%`,
-            background: 'var(--view-source)',
-          }} />
-          <div style={{
-            flex: 1,
-            background: 'var(--accent)',
-          }} />
+        <div
+          aria-hidden="true"
+          className="mt-2.5 flex h-1 overflow-hidden rounded-full bg-muted"
+        >
+          <div className="bg-view-source" style={{ width: `${viaPct}%` }} />
+          <div className="flex-1 bg-primary" />
         </div>
       )}
-      <div style={{
-        fontSize: 11, color: C.muted, marginTop: 8,
-        lineHeight: 1.5,
-      }}>
+      <div className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
         {sublabel}
       </div>
     </Card>
@@ -610,17 +519,16 @@ function KpiCard({ label, value, unit, sublabel, split }: KpiCardProps) {
 }
 
 function Avatar({ name }: { name: string }) {
-  const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
   return (
     <div
-      style={{
-        width: 32, height: 32, borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `linear-gradient(135deg, var(--accent), var(--accent-deep))`,
-        color: C.paper, fontSize: 11, fontWeight: 700,
-        flexShrink: 0,
-      }}
       aria-hidden="true"
+      className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-[11px] font-semibold text-primary-foreground"
     >
       {initials}
     </div>

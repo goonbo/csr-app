@@ -1,23 +1,41 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Search, Plus, Filter } from 'lucide-react';
-import { C } from '@/lib/tokens';
-import { causeStyle } from '@/lib/cause';
-import { PARTNERS } from '@/lib/seed/partners';
-import { PageHeader } from '@/components/primitives/PageHeader';
-import { Card } from '@/components/primitives/Card';
-import { Pill } from '@/components/primitives/Pill';
-import { Button } from '@/components/primitives/Button';
-import { ReadinessTag } from '@/components/primitives/ReadinessTag';
+/**
+ * /partners — admin partners list.
+ *
+ * Header with primary "Add a partner" CTA. Filter row: a rounded
+ * search input (shadcn InputGroup with a leading icon) flexed
+ * alongside a `Filter` outline button. Cards are a responsive 1–2
+ * column grid; each is a clickable Card with a cause-gradient
+ * avatar, name + cause/geo, divider, and a footer pairing
+ * ReadinessTag with a health Pill.
+ *
+ * Search is a simple case-insensitive name match. Empty state is a
+ * muted Card with the search query inlined.
+ */
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Search, Plus, Filter } from "lucide-react";
+import { causeStyle } from "@/lib/cause";
+import { PARTNERS } from "@/lib/seed/partners";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { PageHeader } from "@/components/view/PageHeader";
+import { Pill } from "@/components/view/Pill";
+import { ReadinessTag } from "@/components/view/ReadinessTag";
 
 export default function PartnersListPage() {
   const router = useRouter();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
-  const filtered = PARTNERS.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = PARTNERS.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -25,104 +43,79 @@ export default function PartnersListPage() {
       <PageHeader
         title="Partners"
         subtitle="The people we work with. Their readiness, history, and what makes each relationship work."
-        action={<Button variant="accent" icon={Plus}>Add a partner</Button>}
+        action={
+          <Button>
+            <Plus className="size-4" aria-hidden="true" />
+            Add a partner
+          </Button>
+        }
       />
 
-      {/* Search + filter row — search shrinks gracefully on narrow viewports */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div style={{ position: 'relative', flex: '1 1 240px', maxWidth: 384 }}>
-          <Search
-            size={15}
-            color={C.muted}
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              left: 14,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              pointerEvents: 'none',
-            }}
-          />
-          <input
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <InputGroup className="h-10 max-w-96 flex-[1_1_240px] rounded-full">
+          <InputGroupAddon>
+            <Search className="size-4" aria-hidden="true" />
+          </InputGroupAddon>
+          <InputGroupInput
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search partners…"
             aria-label="Search partners"
-            className="view-input"
-            style={{
-              width: '100%',
-              padding: '10px 16px 10px 40px',
-              fontSize: 14,
-              fontFamily: 'inherit',
-              borderRadius: 999,
-              background: C.paper,
-              border: `1px solid ${C.borderStrong}`,
-              color: C.ink,
-              outline: 'none',
-            }}
           />
-        </div>
-        <Button variant="soft" icon={Filter} size="sm">Filter</Button>
+        </InputGroup>
+        <Button variant="outline" size="sm">
+          <Filter className="size-4" aria-hidden="true" />
+          Filter
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map(p => {
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {filtered.map((p) => {
           const cs = causeStyle(p.cause);
           const Icon = cs.icon;
           return (
             <Card
               key={p.id}
+              role="button"
+              tabIndex={0}
               onClick={() => router.push(`/partners/${p.id}`)}
-              style={{ padding: 20 }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  router.push(`/partners/${p.id}`);
+                }
+              }}
+              className="cursor-pointer p-5 transition-shadow hover:ring-foreground/15"
             >
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 12,
-                marginBottom: 16,
-              }}>
+              <div className="mb-4 flex items-start gap-3">
                 <div
-                  style={{
-                    width: 44, height: 44, borderRadius: 14,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: cs.gradient,
-                    flexShrink: 0,
-                  }}
                   aria-hidden="true"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-2xl"
+                  style={{ backgroundImage: cs.gradient }}
                 >
-                  <Icon size={18} color="white" strokeWidth={2.2} />
+                  <Icon
+                    className="size-[18px] text-white"
+                    strokeWidth={2.2}
+                  />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 15, fontWeight: 500,
-                    color: C.ink, lineHeight: 1.3,
-                    marginBottom: 2,
-                  }}>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-0.5 text-[15px] font-medium leading-snug text-foreground">
                     {p.name}
                   </div>
-                  <div style={{ fontSize: 12, color: C.muted }}>
+                  <div className="text-xs text-muted-foreground">
                     {p.cause} · {p.geo}
                   </div>
                 </div>
               </div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingTop: 14,
-                borderTop: `1px solid ${C.border}`,
-              }}>
-                <div>
-                  {p.hasD ? (
-                    <ReadinessTag tag={p.readinessTag} score={p.readiness} />
-                  ) : (
-                    <ReadinessTag tag="not-assessed" />
-                  )}
-                </div>
-                {p.health === 'thriving' && <Pill tone="sage">Thriving</Pill>}
-                {p.health === 'attention' && <Pill tone="amber">Needs hello</Pill>}
+              <div className="flex items-center justify-between border-t border-border pt-3.5">
+                <ReadinessTag
+                  tag={p.hasD ? p.readinessTag : "not-assessed"}
+                  score={p.hasD ? p.readiness : null}
+                />
+                {p.health === "thriving" && <Pill tone="sage">Thriving</Pill>}
+                {p.health === "attention" && (
+                  <Pill tone="amber">Needs hello</Pill>
+                )}
               </div>
             </Card>
           );
@@ -130,8 +123,8 @@ export default function PartnersListPage() {
       </div>
 
       {filtered.length === 0 && (
-        <Card soft style={{ padding: 48, textAlign: 'center', marginTop: 16 }}>
-          <p style={{ fontSize: 13, color: C.inkLight, margin: 0 }}>
+        <Card className="mt-4 items-center bg-muted/40 p-12 text-center">
+          <p className="m-0 text-[13px] text-muted-foreground">
             No partners match &ldquo;{search}&rdquo;.
           </p>
         </Card>
