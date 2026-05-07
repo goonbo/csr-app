@@ -27,7 +27,7 @@ One variable collection (**Themes**) with three modes: **Operator**, **Blueprint
 
 | Folder | Variables | Mode-dependent? |
 |---|---|---|
-| `color/` | background, foreground, card, card-foreground, primary, primary-foreground, secondary, secondary-foreground, muted, muted-foreground, accent, accent-foreground, destructive, destructive-foreground, border, border-strong, input, ring, rose, rose-bg, rose-fg, amber, amber-bg, amber-fg, emerald, emerald-bg, emerald-fg, view-source, view-source-bg, view-source-fg | Most yes — `primary` flips cyan→emerald in Field; `border` strengthens in Blueprint; `rose/amber/emerald` are stable across modes; `view-source/*` is **always cyan, in every mode** (load-bearing exception) |
+| `color/` | background, foreground, card, card-foreground, primary, primary-foreground, **primary-soft, primary-soft-fg, primary-soft-border**, secondary, secondary-foreground, muted, muted-foreground, accent, accent-foreground, destructive, destructive-foreground, border, border-strong, input, ring, rose, rose-bg, rose-fg, amber, amber-bg, amber-fg, emerald, emerald-bg, emerald-fg, view-source, view-source-bg, view-source-fg | Most yes — `primary` flips cyan→emerald in Field; `border` strengthens in Blueprint; `rose/amber/emerald` are stable across modes; `view-source/*` is **always cyan, in every mode** (load-bearing exception). `primary-soft/-fg/-border` are tinted variants of primary (cyan-50/-800/-200 in Operator+Blueprint, emerald-50/-900/-200 in Field) — see "primary-soft and the bound-paint opacity quirk" below. |
 | `radius/` | none, sm, md, lg, full | Yes — Blueprint generously rounded (10/16), Operator+Field dense (4/6/8) |
 | `spacing/` | 0, 0-5, 1, 1-5, 2, 2-5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24 | No — same in all modes (4px base scale) |
 | `font-size/` | xs, sm, base, lg, xl, 2xl, 3xl, 4xl, 5xl, 6xl | No |
@@ -36,6 +36,22 @@ One variable collection (**Themes**) with three modes: **Operator**, **Blueprint
 ### The view-source exception
 
 `color/view-source`, `color/view-source-bg`, `color/view-source-fg` are **always cyan**, in every mode including Field. This is intentional and load-bearing. ViewSourcePill is the visible expression of the bidirectional architecture — cyan reads as "from VIEW" inside the Field workspace where emerald is local. If these tokens become mode-dependent, the strategic point of the primitive collapses.
+
+### `primary-soft` and the bound-paint opacity quirk
+
+In Tailwind / shadcn-React land, "primary-tinted" surfaces are achieved with the opacity shorthand: `bg-primary/10 text-primary border-primary/30`. The same pattern in code-side Pill terracotta, ReadinessTag sage, MutualFit primary cards, attention-card AI tone, etc.
+
+In Figma, the equivalent — binding a paint to `color/primary` and setting `opacity: 0.10` on the same paint object — **does not work**. The Figma API normalizes the bound paint's opacity back to 1 on assignment, so the rendered surface is fully saturated cyan/emerald instead of a 10% tint. We discovered this while building screen mirrors and verified by inspecting the stored paint via `figma.getNodeById(id).fills`.
+
+Workaround: three new tokens, opaque, pre-tinted per mode:
+
+| Token | Operator + Blueprint | Field | Use for |
+|---|---|---|---|
+| `color/primary-soft` | `#ECFEFF` (cyan-50) | `#ECFDF5` (emerald-50) | The tinted background surface |
+| `color/primary-soft-fg` | `#155E75` (cyan-800) | `#064E3B` (emerald-900) | Readable text on `primary-soft` |
+| `color/primary-soft-border` | `#A5F3FC` (cyan-200) | `#A7F3D0` (emerald-200) | Border on `primary-soft` surfaces |
+
+Use these wherever the React code uses `bg-primary/10 text-primary border-primary/30` — Pill terracotta/sage tones, ReadinessTag sage, MutualFit primary cards, the "Cheapest move" pipeline cells, attention-card AI tone, etc. The visual flips per mode automatically.
 
 ### Naming convention
 
