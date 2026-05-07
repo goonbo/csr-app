@@ -1,0 +1,72 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "view",
+  "homepage": "https://github.com/goonbo/csr-app",
+  "items": [
+    {
+      "name": "pill",
+      "type": "registry:component",
+      "title": "Pill",
+      "description": "Domain-tone variant of Badge for status, signal, and stage tags. Tones: neutral, sage, terracotta, amber, rose. `sage` and `terracotta` are historical labels that resolve to the brand accent (cyan in Operator/Blueprint, emerald in Field).",
+      "registryDependencies": ["badge"],
+      "files": [
+        { "path": "src/components/view/Pill.tsx", "type": "registry:component", "target": "components/view/Pill.tsx" }
+      ]
+    },
+    {
+      "name": "page-header",
+      "type": "registry:component",
+      "title": "PageHeader",
+      "description": "Title block at the top of every screen. Optional eyebrow, H1, optional subtitle, optional action slot, optional back link. H1 picks up Fraunces serif inside Blueprint scope via the `--page-heading-*` tokens.",
+      "files": [
+        { "path": "src/components/view/PageHeader.tsx", "type": "registry:component", "target": "components/view/PageHeader.tsx" }
+      ]
+    },
+    {
+      "name": "ai-block",
+      "type": "registry:component",
+      "title": "AIBlock",
+      "description": "Card variant marking AI-generated or AI-curated content. Cyan halo (ring + faint glow), sparkle eyebrow with the AI label, optional regenerate button. Cyan is the global AI signal; renders correctly across all themes.",
+      "registryDependencies": ["card"],
+      "files": [
+        { "path": "src/components/view/AIBlock.tsx", "type": "registry:component", "target": "components/view/AIBlock.tsx" }
+      ]
+    },
+    {
+      "name": "loading-steps",
+      "type": "registry:component",
+      "title": "LoadingSteps",
+      "description": "Multi-step AI loading sequence with three states per step (done / active / pending). Driven by the useAILoad hook.",
+      "files": [
+        { "path": "src/components/view/LoadingSteps.tsx", "type": "registry:component", "target": "components/view/LoadingSteps.tsx" }
+      ]
+    },
+    {
+      "name": "readiness-tag",
+      "type": "registry:component",
+      "title": "ReadinessTag",
+      "description": "Qualitative diligence outcome with five states: Strong, Solid, Worth a closer look, Limited evidence, Not assessed. Resolves by explicit `tag` prop or by `score`. Two sizes: default for inline lists, lg for partner-detail headers.",
+      "files": [
+        { "path": "src/components/view/ReadinessTag.tsx", "type": "registry:component", "target": "components/view/ReadinessTag.tsx" }
+      ]
+    },
+    {
+      "name": "view-source-pill",
+      "type": "registry:component",
+      "title": "ViewSourcePill",
+      "description": "Marks data flowing in from a VIEW corporate partner. Cyan in every theme — in Field this reads as foreign, providing the load-bearing visual for cross-workspace data provenance.",
+      "files": [
+        { "path": "src/components/view/ViewSourcePill.tsx", "type": "registry:component", "target": "components/view/ViewSourcePill.tsx" }
+      ]
+    },
+    {
+      "name": "top-nav",
+      "type": "registry:component",
+      "title": "TopNav",
+      "description": "Workspace chrome — brand mark, active-workspace pill, primary tab nav for the active workspace, workspace switcher, avatar. Workspace is derived from the current pathname.",
+      "files": [
+        { "path": "src/components/view/TopNav.tsx", "type": "registry:component", "target": "components/view/TopNav.tsx" }
+      ]
+    }
+  ]
+}

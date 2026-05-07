@@ -3,11 +3,13 @@
  *
  * Used for status, signal, and stage tags throughout the product
  * (event pipeline state, partner readiness signals, attention queue
- * categories, etc.). Tone names — `sage`, `terracotta`, `amber`,
- * `rose`, `neutral` — are stable across the system. The underlying
- * colors are Tailwind's emerald/orange/amber/rose palettes; the
- * names persist from the prior design language so designers and
- * developers share a vocabulary.
+ * categories, etc.). Tone names — `neutral`, `sage`, `terracotta`,
+ * `amber`, `rose` — are stable across the system. `sage` and
+ * `terracotta` are historical labels that both alias to the brand
+ * accent (`--primary`): cyan in Operator/Blueprint, emerald in
+ * Field. `amber` and `rose` use the Tailwind palettes directly.
+ * The names persist from the prior design language so designers
+ * and developers share a vocabulary.
  *
  * Composes shadcn's Badge with `variant="outline"` as a base, then
  * layers tone-specific bg/text/border classes on top.
@@ -46,7 +48,7 @@ interface PillProps
   icon?: LucideIcon;
 }
 
-export function Pill({
+function Pill({
   tone,
   icon: Icon,
   className,
@@ -67,4 +69,5 @@ export function Pill({
   );
 }
 
-export { pillVariants };
+export { Pill, pillVariants };
+export type { PillProps };

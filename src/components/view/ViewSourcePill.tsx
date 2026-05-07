@@ -46,7 +46,7 @@ interface ViewSourcePillProps
   hideIcon?: boolean;
 }
 
-export function ViewSourcePill({
+function ViewSourcePill({
   partner,
   label,
   hideIcon = false,
@@ -74,4 +74,5 @@ export function ViewSourcePill({
   );
 }
 
-export { viewSourceVariants };
+export { ViewSourcePill, viewSourceVariants };
+export type { ViewSourcePillProps };

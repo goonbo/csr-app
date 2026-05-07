@@ -1,6 +1,6 @@
 # shadcn rebuild — session handoff
 
-Picking up the rebuild from a clean context. Started 2026-05-06. **Phases 4–5 complete.** Next: Phase 6 (Figma export readiness).
+Picking up the rebuild from a clean context. Started 2026-05-06. **Phases 4–6 complete.** All 18 routes shipped on shadcn primitives; parity audit landed; voice & language pass landed (`COPY_AUDIT.md` at the repo root); Figma export structure in place (`registry.json` at the repo root catalogs the seven view/ primitives).
 
 ## Where things live
 
@@ -106,10 +106,46 @@ Held back as intentional improvements (not parity drift):
   legacy contained mist rectangle. Editorial register is still
   carried by typography (Fraunces) and ring-bounded cards.
 
-### Phase 6 — Figma export readiness
-- Verify `components.json` setup is correct
-- Test shadcn-Figma MCP export for at least: Button, Card, Badge, Tabs, Pill, ReadinessTag
-- Fix any naming/structure issues that surface
+### Phase 6 — Figma export readiness (complete ✅)
+
+What landed:
+
+* `components.json` verified — schema URL set, tailwind config pointing
+  at `src/app/globals.css`, `cssVariables: true`, lucide as the icon
+  library, aliases match the `@/components` / `@/lib` / `@/components/ui`
+  layout. `registries: {}` left empty (no remote registries in use).
+* `registry.json` added at the repo root, cataloging the seven view/
+  primitives — Pill, PageHeader, AIBlock, LoadingSteps, ReadinessTag,
+  ViewSourcePill, TopNav. Each entry has a title, a one-paragraph
+  description, the file path, and (where applicable) a
+  `registryDependencies` list pointing at the shadcn ui/ primitive it
+  composes (`badge` for Pill, `card` for AIBlock).
+* Component export style normalized for the three view/ primitives
+  that expose CVA variants (Pill, ReadinessTag, ViewSourcePill).
+  Single bottom-of-file `export { Component, componentVariants }` plus
+  `export type { ComponentProps }`. Matches the shadcn ui/ convention
+  exactly — easier for any registry consumer (including the Figma
+  plugin) to discover both the component and its variant tokens.
+* Pill JSDoc updated to reflect the parity-fix reality — `sage` and
+  `terracotta` now alias to `--primary`, not the literal Tailwind
+  emerald/orange palettes. Documenting the actual behavior so designers
+  reading the code see what the system actually does.
+* Verified at the sandbox route: every primitive renders with its
+  `data-slot` attribute (top-nav, workspace-pill, workspace-switcher,
+  avatar, avatar-fallback, pill, page-header / -greeting / -title /
+  -subtitle / -action, button, ai-block / -eyebrow, loading-steps /
+  loading-step, readiness-tag, view-source-pill). 18 distinct slots
+  exposed for design-system traceability.
+* tsc + eslint + prod build clean post-changes.
+
+What's still external (out of scope here, requires actual Figma):
+
+* Running the shadcn-Figma plugin (https://www.figma.com/community/plugin/1490086627402105845)
+  against `registry.json` to import variants. The plugin is what the
+  designer runs in Figma; the code side is now structured to support it.
+* Code Connect bindings between Figma component nodes and the
+  registry entries. That's a Figma file-side configuration, not a
+  code change.
 
 ## Hard rules (shadcn discipline)
 
@@ -228,12 +264,13 @@ src/
 1. `cd .claude/worktrees/shadcn-rebuild && git pull`
 2. `corepack pnpm install` (in case lockfile changed)
 3. Read this file
-4. Phases 4–5 are complete. **Move on to Phase 6 (Figma export readiness).**
+4. **Phases 4–6 are complete.** The rebuild branch is ready to
+   merge. Open a PR from `claude/shadcn-rebuild` → `main`, title
+   "shadcn rebuild — phases 1–6," reference the per-phase commits
+   listed above. The two reference docs at the repo root are
+   `COPY_AUDIT.md` (voice pass log) and `REBUILD_HANDOFF.md` (this
+   file).
 
-For Phase 5 the recipe was: start both dev servers (`next-dev` for
-festive on :3000, `next-dev-shadcn` for rebuild on :3100), navigate
-each URL on both, screenshot, and `getComputedStyle()` any element
-whose color looked off. The dominant drift turned out to be one
-class of issue — emerald-as-cyan literal classes — which is now
-captured in the domain primitives (`Pill` / `ReadinessTag`) so
-future routes inherit the right behavior automatically.
+For follow-up work: the spawned task to fix `--view-source-foreground`
+landed inline (commit `2886695`); no other open tasks from the
+rebuild are outstanding.

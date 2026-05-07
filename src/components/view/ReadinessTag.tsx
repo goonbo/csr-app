@@ -48,7 +48,7 @@ interface ReadinessTagProps
   score?: number | null;
 }
 
-export function ReadinessTag({
+function ReadinessTag({
   tag,
   score,
   size,
@@ -73,4 +73,5 @@ export function ReadinessTag({
   );
 }
 
-export { readinessVariants };
+export { ReadinessTag, readinessVariants };
+export type { ReadinessTagProps };
