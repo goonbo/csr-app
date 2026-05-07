@@ -1,0 +1,9 @@
+{
+  "codeConnect": {
+    "include": ["src/components/**/*.figma.tsx"],
+    "exclude": ["src/components/**/*.test.tsx"],
+    "documentUrlSubstitutions": {},
+    "label": "VIEW",
+    "parser": "react"
+  }
+}
