@@ -142,7 +142,7 @@ function EventGrid({
     return (
       <Card className="items-center bg-muted/40 p-12 text-center">
         <p className="m-0 text-[13px] text-muted-foreground">
-          No events in this stage right now.
+          No events in this stage.
         </p>
       </Card>
     );
@@ -188,7 +188,7 @@ function EventCard({
         <Pill tone={stage.tone}>{stage.label}</Pill>
         {e.date ? (
           <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {fmtDate(e.date)}
+            {fmtDate(e.date, false)}
           </span>
         ) : (
           <span className="text-[11px] italic text-muted-foreground">

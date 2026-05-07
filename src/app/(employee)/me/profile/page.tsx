@@ -257,8 +257,8 @@ export default function EmployeeProfilePage() {
                 </div>
                 <div className="text-xs leading-relaxed text-foreground/70">
                   18h across two quarters puts you in the top 18% of
-                  contributors at CloudMotion. Sarah may reach out about
-                  being a captain next event.
+                  contributors at CloudMotion. Sarah may ask you to
+                  captain the next event.
                 </div>
               </div>
             </div>

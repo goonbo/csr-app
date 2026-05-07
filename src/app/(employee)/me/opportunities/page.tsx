@@ -151,8 +151,8 @@ export default function OpportunitiesPage() {
       {sorted.length === 0 && (
         <Card className="bg-muted/40 p-8">
           <div className="text-sm leading-relaxed text-foreground/70">
-            Nothing here right now — try a different filter, or wait a few
-            days. Sarah is sourcing new partners every week.
+            Nothing matches this filter. Sarah is sourcing new partners
+            every week — check back in a few days, or try a different filter.
           </div>
         </Card>
       )}
