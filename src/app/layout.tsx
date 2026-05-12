@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight, Fraunces, JetBrains_Mono } from "next/font/google";
+import { Inter_Tight, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -11,23 +11,24 @@ const sans = Inter_Tight({
   display: "swap",
 });
 
-const serif = Fraunces({
-  subsets: ["latin"],
-  axes: ["opsz", "SOFT"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
 });
 
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "VIEW",
   description:
-    "AI-native CSR operator platform for mid-market companies.",
+    "AI-native operating system for corporate volunteer programs.",
 };
 
 export default function RootLayout({
@@ -39,7 +40,7 @@ export default function RootLayout({
       className={cn(sans.variable, serif.variable, mono.variable)}
     >
       <body>
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
         <Toaster />
       </body>
     </html>
