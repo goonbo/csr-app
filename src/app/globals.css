@@ -1,252 +1,135 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
-
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
 
 /* =========================================================
-   Tailwind v4 @theme map — exposes our CSS variables to the
-   semantic Tailwind classes (bg-background, bg-primary, etc.).
+   VIEW v5 design tokens.
+
+   Tailwind 4 uses CSS-based config via @theme inline.
+   These tokens come from <design_system> in
+   view-build-prompt-v5.md and are WCAG 2.2 AA verified.
+
+   Two custom hues (ink, ink-faint) extend the palette;
+   the rest map to slate / cyan / green / amber / red.
    ========================================================= */
 @theme inline {
+  /* Brand navy + faint variant */
+  --color-ink: #0a1a2e;
+  --color-ink-faint: #7c8b9f;
+
+  /* Semantic aliases for slate scale */
+  --color-ink-subtle: #475569;
+  --color-ink-muted: #64748b;
+
+  /* Accent palette anchors (each register flips --accent at the layout level) */
+  --color-accent-cyan: #0e7490;
+  --color-accent-green: #15803d;
+
+  /* Per-layout accent — read from --accent CSS variable */
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  /* Status */
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+  --color-success: #15803d;
+
+  /* Surfaces */
+  --color-paper: #ffffff;
+  --color-mist: #f1f5f9;
+  --color-hairline: #e2e8f0;
+
+  /* shadcn-compatible semantic aliases — keep so installed shadcn
+     primitives still render. We lean on operator defaults for these. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-card: #ffffff;
+  --color-card-foreground: #0a1a2e;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a1a2e;
+  --color-primary: var(--accent);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0a1a2e;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #475569;
+  --color-destructive: #b91c1c;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: var(--accent);
 
-  --color-view-source: var(--view-source);
-  --color-view-source-foreground: var(--view-source-foreground);
-  --color-view-source-muted: var(--view-source-muted);
+  /* Font families wired from next/font CSS variables */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
 
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  /* Radii — operator chrome is dense, blueprint is generous.
+     Card/button defaults intentionally small. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius: 6px;
 
-  --font-sans:    var(--font-sans);
-  --font-serif:   var(--font-serif);
-  --font-mono:    var(--font-mono);
-  --font-heading: var(--heading-family);
-
-  --radius-sm: calc(var(--radius) - 2px);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) + 2px);
-  --radius-xl: calc(var(--radius) + 6px);
+  /* Letter-spacing tokens from design system */
+  --tracking-tighter: -0.02em;
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.1em;
 }
 
 /* =========================================================
-   Operator — :root default. Corporate chrome and dashboards.
-   White surface, navy ink, cyan brand accent, dense radii.
+   Per-register accent override.
+
+   Operator chrome (corporate): cyan
+   Field chrome (nonprofit):    green
+   Blueprint document:          inherits whatever register
+                                wraps it (cyan by default)
    ========================================================= */
 :root,
-[data-theme="operator"] {
-  --background:           oklch(1 0 0);
-  --foreground:           oklch(0.208 0.042 265.755);  /* slate-900 ≈ #0A1A2E */
-  --card:                 oklch(1 0 0);
-  --card-foreground:      oklch(0.208 0.042 265.755);
-  --popover:              oklch(1 0 0);
-  --popover-foreground:   oklch(0.208 0.042 265.755);
+[data-accent="cyan"] {
+  --accent: #0e7490;
+  --accent-soft: color-mix(in oklab, #0e7490 12%, white);
+  --background: #ffffff;
+  --foreground: #0a1a2e;
+}
 
-  /* Brand accent — cyan, the action color */
-  --primary:              oklch(0.609 0.126 221.723);  /* cyan-600 ≈ #0891B2 */
-  --primary-foreground:   oklch(0.984 0.003 247.858);
-
-  /* shadcn "secondary" / "accent" / "muted" — soft slate surfaces.
-     NOTE: shadcn names "accent" is a hover surface, NOT the brand
-     accent. Brand action is "primary". */
-  --secondary:            oklch(0.968 0.007 247.896);  /* slate-100 */
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted:                oklch(0.968 0.007 247.896);
-  --muted-foreground:     oklch(0.446 0.043 257.281);  /* slate-600 ≈ #475569 */
-  --accent:               oklch(0.968 0.007 247.896);
-  --accent-foreground:    oklch(0.208 0.042 265.755);
-
-  --destructive:          oklch(0.577 0.245 27.325);   /* red-600 */
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-
-  --border:               oklch(0.929 0.013 255.508);  /* slate-200 ≈ #E2E8F0 */
-  --input:                oklch(0.929 0.013 255.508);
-  --ring:                 oklch(0.609 0.126 221.723);  /* cyan, matches primary */
-
-  /* VIEW source — cyan in any theme. In Field this reads as foreign;
-     in Operator it's the same hue as --primary (consumers add a
-     sparkle icon + label so the meaning is still legible).
-     Foreground is deep cyan, sized for readable text on the muted
-     tint and on transparent surfaces. Saturated `bg-view-source`
-     pairs with explicit `text-white` at the consumer site. */
-  --view-source:            oklch(0.609 0.126 221.723);
-  --view-source-foreground: oklch(0.43 0.13 222);     /* cyan-700-ish */
-  --view-source-muted:      oklch(0.967 0.025 220);    /* cyan-50 tint */
-
-  /* Charts — keep neutrally diverse so cause-color avatars don't
-     collide. Real cause palette is applied per-component. */
-  --chart-1: oklch(0.609 0.126 221.723);
-  --chart-2: oklch(0.704 0.158 49.5);    /* orange-500ish */
-  --chart-3: oklch(0.627 0.194 149.214); /* green-600 */
-  --chart-4: oklch(0.659 0.217 305);     /* violet-500 */
-  --chart-5: oklch(0.704 0.18 12);       /* rose-500 */
-
-  /* Heading family — Operator uses sans (Inter Tight). Blueprint
-     overrides to serif (Fraunces) below for the editorial register.
-     `--page-heading-size` and `-weight` track per-scope hero sizing
-     so PageHeader scales up to Fraunces 56px in Blueprint without
-     a wrapper-level conditional. */
-  --heading-family: var(--font-sans);
-  --page-heading-size:   1.875rem;      /* 30px — Operator/Field */
-  --page-heading-weight: 600;
-  --page-heading-tracking: -0.025em;
-
-  --radius: 0.375rem;                    /* 6px — dense */
+[data-accent="green"] {
+  --accent: #15803d;
+  --accent-soft: color-mix(in oklab, #15803d 12%, white);
 }
 
 /* =========================================================
-   Blueprint — narrative pages (recap, reports, np/recap).
-   Mist surface, generous radii, Fraunces serif H1 elsewhere.
+   Resets + body chrome.
+
+   Note: the v5 prompt suggested `min-width: 1280px; overflow-x: auto`
+   on body, but pairing that with the shadcn sidebar (which is
+   `position: fixed`) causes the sidebar to overlap content when the
+   user horizontally scrolls. Min-width lives on the content area
+   instead — see SidebarInset > main below.
    ========================================================= */
-[data-theme="blueprint"] {
-  --background:         oklch(0.974 0.005 247.858);    /* mist ≈ #F5F7FA */
-  --foreground:         oklch(0.208 0.042 265.755);
-  --card:               oklch(1 0 0);
-  --card-foreground:    oklch(0.208 0.042 265.755);
-  --popover:            oklch(1 0 0);
-  --popover-foreground: oklch(0.208 0.042 265.755);
-
-  --primary:            oklch(0.609 0.126 221.723);    /* cyan, same as Operator */
-  --primary-foreground: oklch(0.984 0.003 247.858);
-
-  --secondary:          oklch(0.929 0.013 255.508);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted:              oklch(0.929 0.013 255.508);
-  --muted-foreground:   oklch(0.446 0.043 257.281);
-  --accent:             oklch(0.929 0.013 255.508);
-  --accent-foreground:  oklch(0.208 0.042 265.755);
-
-  --destructive:        oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-
-  --border:             oklch(0.852 0.029 248);        /* slate-300, slightly stronger */
-  --input:              oklch(0.852 0.029 248);
-  --ring:               oklch(0.609 0.126 221.723);
-
-  --view-source:            oklch(0.609 0.126 221.723);
-  --view-source-foreground: oklch(0.43 0.13 222);
-  --view-source-muted:      oklch(0.967 0.025 220);
-
-  /* Editorial register — H1 reads as Fraunces serif here, larger
-     and lighter for the magazine-cover register */
-  --heading-family: var(--font-serif);
-  --page-heading-size:   3.5rem;        /* 56px */
-  --page-heading-weight: 350;
-  --page-heading-tracking: -0.025em;
-
-  --radius: 0.625rem;                   /* 10px — generous */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
-/* =========================================================
-   Field — nonprofit workspace. Identical to Operator on
-   surface and ink; primary flips cyan → emerald.
-   ========================================================= */
-[data-theme="field"] {
-  --background:         oklch(1 0 0);
-  --foreground:         oklch(0.208 0.042 265.755);
-  --card:               oklch(1 0 0);
-  --card-foreground:    oklch(0.208 0.042 265.755);
-  --popover:            oklch(1 0 0);
-  --popover-foreground: oklch(0.208 0.042 265.755);
-
-  /* The single visible signal of the workspace shift */
-  --primary:            oklch(0.627 0.194 149.214);    /* green-600 ≈ #16A34A */
-  --primary-foreground: oklch(0.984 0.003 247.858);
-
-  --secondary:          oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted:              oklch(0.968 0.007 247.896);
-  --muted-foreground:   oklch(0.446 0.043 257.281);
-  --accent:             oklch(0.968 0.007 247.896);
-  --accent-foreground:  oklch(0.208 0.042 265.755);
-
-  --destructive:        oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-
-  --border:             oklch(0.929 0.013 255.508);
-  --input:              oklch(0.929 0.013 255.508);
-  --ring:               oklch(0.627 0.194 149.214);    /* emerald, matches primary */
-
-  /* VIEW source stays cyan — the load-bearing "foreign here" mark. */
-  --view-source:            oklch(0.609 0.126 221.723);
-  --view-source-foreground: oklch(0.43 0.13 222);
-  --view-source-muted:      oklch(0.967 0.025 220);
-
-  --chart-1: oklch(0.609 0.126 221.723);
-  --chart-2: oklch(0.704 0.158 49.5);
-  --chart-3: oklch(0.627 0.194 149.214);
-  --chart-4: oklch(0.659 0.217 305);
-  --chart-5: oklch(0.704 0.18 12);
-
-  --heading-family: var(--font-sans);
-
-  --radius: 0.375rem;
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* =========================================================
-   Dark mode stub — shadcn expects .dark to exist even if we
-   never ship it. Empty values; if dark mode is ever wanted,
-   scopes go here.
-   ========================================================= */
-.dark { }
-
-/* =========================================================
-   Base styles
-   ========================================================= */
-@layer base {
-  * { @apply border-border outline-ring/50; }
-  body { @apply bg-background text-foreground antialiased; font-size: 14px; min-height: 100vh; }
-  html { @apply font-sans; }
-}
-
-/* Theme wrappers carry only the CSS-var scope by default. The
-   route-group layouts already paint `bg-background` on their root,
-   so we don't double-apply here. Pages that wrap a Blueprint
-   section inside an Operator/Field shell inherit the parent
-   surface (white) — cards stay `bg-card`, and the editorial
-   register is carried by typography (Fraunces) and radii, not by
-   a contained mist rectangle. */
-[data-theme="blueprint"],
-[data-theme="field"],
-[data-theme="operator"] {
-  color: var(--foreground);
-}
-
-/* =========================================================
-   Motion
-   ========================================================= */
-@keyframes alert-pulse {
-  0%, 100% { transform: scale(1);    opacity: 1;   }
-  50%      { transform: scale(1.25); opacity: 0.7; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+/* Focus rings honor accent */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
